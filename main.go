@@ -135,7 +135,7 @@ func main() {
 	app1 := submit_rout.Handler(http.HandlerFunc(submit_ctrl))
 	app2 := setAddress_rout.Handler(http.HandlerFunc(setAddress_ctrl))
 	http.Handle("/submit", app1)
-	http.Handle("/setAddress", app1)
+	http.Handle("/setAddress", app2)
 	log.Fatal(http.ListenAndServe(":80", nil))
 
 }
