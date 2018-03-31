@@ -3,8 +3,8 @@ package magic
 import (
 	"log"
 
-	mgo "mgo.v2"
-	"mgo.v2/bson"
+	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type user struct {
@@ -37,9 +37,9 @@ func Verify_phone(phone string) (verify_code int32) {
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
-		log.Fatal("\n!!!!-- DB connection error:")
-		log.Fatal(err)
-		log.Fatal("\n")
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
 		return -1
 	}
 
@@ -50,12 +50,12 @@ func Verify_phone(phone string) (verify_code int32) {
 
 	if err != nil {
 
-		log.Fatal(err)
-		log.Fatal("\nnew user submited:" + phone + "\n")
+		log.Print(err)
+		log.Print("\nnew user submited:" + phone + "\n")
 		return 12345
 	} else {
 
-		log.Fatal("\nduplicate user try to submit...\n")
+		log.Print("\nduplicate user try to submit...\n")
 		return 0
 	}
 

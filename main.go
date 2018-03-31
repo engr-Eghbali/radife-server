@@ -28,16 +28,20 @@ func submit_ctrl(w http.ResponseWriter, r *http.Request) {
 
 			if code == 0 {
 				fmt.Fprintf(w, "0")
+				return
 			}
 			if code == -1 {
 				fmt.Fprintf(w, "-1")
+				return
 			} else {
-				fmt.Fprintf(w, phone)
+				fmt.Fprintf(w, code)
+				return
 			}
 
 		} else {
 
 			fmt.Fprintf(w, "شماره تلفن شما صحیح نمی باشد.")
+			return
 
 		}
 
