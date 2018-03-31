@@ -11,13 +11,13 @@ type PreShop struct {
 
 	Add string `json:"add"`
 
-	Stars string `json:"stars"`
+	Stars int64 `json:"stars"`
 
 	Avatar string `json:"avatar"`
 
 	Off string `json:"off"`
 
-	Delivery string `json:"delivery"`
+	Delivery int64 `json:"delivery"`
 }
 
 func Get_category(cat string) (preview []PreShop) {
@@ -39,9 +39,14 @@ func Get_category(cat string) (preview []PreShop) {
 	err = c.Find(nil).All(&results)
 
 	if err != nil {
+
+		log.Print("\n category query failed:\n")
+		log.Print(err)
+		return nil
+
+	} else {
 		return results
+
 	}
-	log.Print("\n category query failed:\n")
-	log.Print(err)
-	return nil
+
 }

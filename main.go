@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	auth "./packages/auth"
 	req "./packages/req"
@@ -95,16 +96,33 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var response string
 		var shops []req.PreShop
+		var ranking string
+		var i int64 = 0
 		r.ParseForm()
 		cat := r.Form["category"][0]
 		shops = req.Get_category(cat)
 
-		for shop := range shops {
+		for _, shop := range shops {
 
-			response = response + "<div class=\"market\" onclick=\"getgoods()\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\"><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star-empty\"></span><span class=\"glyphicon glyphicon-star-empty\"></span></p><p class=\"restoff\">" + shop.Off + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + shop.Delivery + "</p></div></div>"
+			offer := shop.Off + "%%تخفیف"
+			delivery := "ارسال رایگان"
+			if shop.Delivery != 0 {
+				delivery = strconv.FormatInt(shop.Delivery, 10) + "هزینه ارسال"
+			}
+			for i < 6 {
+
+				if shop.Stars > i {
+					ranking = ranking + "<span class=\"glyphicon glyphicon-star-empty\"></span>"
+				} else {
+					ranking = ranking + "<span class=\"glyphicon glyphicon-star\"></span>"
+				}
+
+				i++
+			}
+
+			response = response + "<div class=\"market\" onclick=\"getgoods()\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\">" + ranking + "</p><p class=\"restoff\">" + offer + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + delivery + "</p></div></div>"
 
 		}
-
 		fmt.Fprintf(w, response)
 	}
 }
