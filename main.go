@@ -26,11 +26,11 @@ func submit_ctrl(w http.ResponseWriter, r *http.Request) {
 
 			code := auth.Verify_phone(phone)
 
-			if code == 0 {
+			if code == "0" {
 				fmt.Fprintf(w, "0")
 				return
 			}
-			if code == -1 {
+			if code == "-1" {
 				fmt.Fprintf(w, "-1")
 				return
 			} else {

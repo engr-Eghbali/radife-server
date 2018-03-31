@@ -31,7 +31,7 @@ type user struct {
 	log []string `json:"log"`
 }
 
-func Verify_phone(phone string) (verify_code int32) {
+func Verify_phone(phone string) (verify_code string) {
 
 	var result user
 	session, err := mgo.Dial("127.0.0.1")
@@ -40,7 +40,7 @@ func Verify_phone(phone string) (verify_code int32) {
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return -1
+		return "-1"
 	}
 
 	defer session.Close()
@@ -52,11 +52,11 @@ func Verify_phone(phone string) (verify_code int32) {
 
 		log.Print(err)
 		log.Print("\nnew user submited:" + phone + "\n")
-		return 12345
+		return "12345"
 	} else {
 
 		log.Print("\nduplicate user try to submit...\n")
-		return 0
+		return "0"
 	}
 
 }
