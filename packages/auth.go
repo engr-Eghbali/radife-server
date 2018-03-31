@@ -7,6 +7,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+////////////////user info data type//////////////////////////////////////////
+
 type user struct {
 	ID bson.ObjectId `json:"id" bson:"_id,omitempty"`
 
@@ -30,6 +32,8 @@ type user struct {
 
 	Log []string `json:"log"`
 }
+
+/////////////////////////////verify phone number/////////////////////////////////
 
 func Verify_phone(phone string) (verify_code string) {
 
@@ -61,6 +65,39 @@ func Verify_phone(phone string) (verify_code string) {
 
 		log.Print("\nduplicate user try to submit...\n")
 		return "0"
+	}
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////update address//////////////////////////////////
+
+func Update_add(phone string, add string, x string, y string) (flg bool) {
+
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return false
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("userinfo").C("users")
+
+	colQuerier := bson.M{"phone": phone}
+	change := bson.M{"$set": bson.M{"add": add, "x": x, "y": y}}
+	err = c.Update(colQuerier, change)
+	if err != nil {
+		log.Print("\nupdate address failed...\n")
+		log.Print(err)
+		return false
+
+	} else {
+		return true
 	}
 
 }
