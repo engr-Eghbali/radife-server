@@ -10,31 +10,31 @@ import (
 type user struct {
 	ID bson.ObjectId `json:"id" bson:"_id,omitempty"`
 
-	phone string `json:"phone"`
+	Phone string `json:"phone"`
 
-	name string `json:"name"`
+	Name string `json:"name"`
 
-	add string `json:"add"`
+	Add string `json:"add"`
 
-	x string `json:"x"`
+	X string `json:"x"`
 
-	y string `json:"y"`
+	Y string `json:"y"`
 
-	rank string `json:"rank"`
+	Rank string `json:"rank"`
 
-	level string `json:"level"`
+	Level string `json:"level"`
 
-	pending string `json:"pending"`
+	Pending string `json:"pending"`
 
-	avatar string `json:"avatar"`
+	Avatar string `json:"avatar"`
 
-	log []string `json:"log"`
+	Log []string `json:"log"`
 }
 
 func Verify_phone(phone string) (verify_code string) {
 
 	var result user
-	
+
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
@@ -50,9 +50,11 @@ func Verify_phone(phone string) (verify_code string) {
 	err = c.Find(bson.M{"phone": phone}).One(&result)
 
 	if err != nil {
-        var newUser user
+
+		inlog := []string{"null", "null"}
+
 		log.Print(err)
-		err=c.Insert(&newUser{phone: phone, name: "نام", add:"آدرس", x: "0", y: "0", rank: "b", level: "1",pending:"null",avatar:"avatar.jpg",log[0]="0"})
+		err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog})
 		log.Print("\nnew user submited:" + phone + "\n")
 		return "12345"
 	} else {
