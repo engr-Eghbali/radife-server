@@ -19,7 +19,7 @@ func submit_ctrl(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 
 		var phone string
-
+		r.ParseForm()
 		phone = r.Form["phone"][0]
 
 		if len(phone) == 11 {
@@ -76,6 +76,6 @@ func main() {
 
 	app1 := submit_rout.Handler(http.HandlerFunc(submit_ctrl))
 	http.Handle("/submit", app1)
-	log.Fatal(http.ListenAndServe("127.0.0.1:80", nil))
+	log.Fatal(http.ListenAndServe(":80", nil))
 
 }

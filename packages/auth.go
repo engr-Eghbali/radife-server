@@ -34,6 +34,7 @@ type user struct {
 func Verify_phone(phone string) (verify_code string) {
 
 	var result user
+	
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
@@ -49,8 +50,9 @@ func Verify_phone(phone string) (verify_code string) {
 	err = c.Find(bson.M{"phone": phone}).One(&result)
 
 	if err != nil {
-
+        var newUser user
 		log.Print(err)
+		err=c.Insert(&newUser{phone: phone, name: "نام", add:"آدرس", x: "0", y: "0", rank: "b", level: "1",pending:"null",avatar:"avatar.jpg",log[0]="0"})
 		log.Print("\nnew user submited:" + phone + "\n")
 		return "12345"
 	} else {
