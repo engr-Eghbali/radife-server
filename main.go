@@ -27,10 +27,10 @@ func submit_ctrl(w http.ResponseWriter, r *http.Request) {
 			code := auth.Verify_phone(phone)
 
 			if code == 0 {
-				fmt.Fprintf(w, "شماره تلفن شما قبلا ثبت شده است.")
+				fmt.Fprintf(w, "0")
 			}
 			if code == -1 {
-				fmt.Fprintf(w, "خطای سیستم،مجددا تلاش کنید")
+				fmt.Fprintf(w, "-1")
 			} else {
 				fmt.Fprintf(w, phone)
 			}
@@ -72,6 +72,6 @@ func main() {
 
 	app1 := submit_rout.Handler(http.HandlerFunc(submit_ctrl))
 	http.Handle("/submit", app1)
-	log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
+	log.Fatal(http.ListenAndServe("127.0.0.1:80", nil))
 
 }
