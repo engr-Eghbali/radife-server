@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	auth "./packages/auth"
-	req  "./packages/req"
+	req "./packages/req"
 	"github.com/unrolled/secure"
 )
 
@@ -93,19 +93,19 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if r.Method == "POST" {
-        var response string
+		var response string
 		var shops []req.PreShop
 		r.ParseForm()
 		cat := r.Form["category"][0]
-		shops=req.Get_category(cat)
-		
-		for shop := shops {
+		shops = req.Get_category(cat)
 
-        response=response+"<div class=\"market\" onclick=\"getgoods()\"><img class=\"marketicon\" src=\"" +shop.Avatar+ "\"><p class=\"restname\">"+shop.Name+"</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>"+shop.Add+"</p><div id=\"reststatus\"><p class=\"stars\"><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star-empty\"></span><span class=\"glyphicon glyphicon-star-empty\"></span></p><p class=\"restoff\">"+shop.Off+"</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>"+shop.Delivery+"</p></div></div>"
+		for shop := range shops {
+
+			response = response + "<div class=\"market\" onclick=\"getgoods()\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\"><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star\"></span><span class=\"glyphicon glyphicon-star-empty\"></span><span class=\"glyphicon glyphicon-star-empty\"></span></p><p class=\"restoff\">" + shop.Off + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + shop.Delivery + "</p></div></div>"
 
 		}
-		
-      fmt.Fprintf(w,response)
+
+		fmt.Fprintf(w, response)
 	}
 }
 
