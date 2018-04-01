@@ -120,7 +120,7 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 				i++
 			}
 
-			response = response + "<div class=\"market\" onclick=\"getgoods(\"" + shop.Phone + "\")><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\">" + ranking + "</p><p class=\"restoff\">" + offer + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + delivery + "</p></div></div>"
+			response = response + "<div class=\"market\" onclick=\"getgoods('" + shop.Phone + "')\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\">" + ranking + "</p><p class=\"restoff\">" + offer + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + delivery + "</p></div></div>"
 
 		}
 		fmt.Fprintf(w, response)
@@ -131,7 +131,7 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 
 ///////////////////////////get goods of each shop//////////////////////////////
 
-func category_ctrl(w http.ResponseWriter, r *http.Request) {
+func goods_ctrl(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -139,8 +139,6 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		var response string
 		var goods []req.Good
-		var ranking string
-		var i int64 = 0
 
 		r.ParseForm()
 
@@ -150,7 +148,7 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		for _, good := range goods {
 
-			response = response + "<div class=\"good\"><img id=\"goodicon" + good.ID + "\"class=\"goodicon\" src=\"" + good.Pic + "\"><div class=\"goodinfo\"></br></br><p1 class=\"goodname\" id=\"goodname" + good.ID + "\">" + good.Name + "\"</p1></br><p2 class=\"gooddetail\" id=\"gooddetail" + good.ID + "\">" + good.Info + "</p2></br><p3 class=\"goodprice\" id=\"goodprice" + good.ID + "\">" + good.Price + "تومان</p3></div><div id=\"addremove\"><button class=\"adder\" onclick=\"addgood('" + good.ID + "')\"></button><button id=\"remover" + good.ID + "\" class=\"remover\" onclick=\"removegood('" + good.ID + "')\"></button></div></div>"
+			response = response + "<div class=\"good\"><img id=\"goodicon" + good.ID.Hex() + "\"class=\"goodicon\" src=\"" + good.Pic + "\"><div class=\"goodinfo\"></br></br><p1 class=\"goodname\" id=\"goodname" + good.ID.Hex() + "\">" + good.Name + "</p1></br><p2 class=\"gooddetail\" id=\"gooddetail" + good.ID.Hex() + "\">" + good.Detail + "</p2></br><p3 class=\"goodprice\" id=\"goodprice" + good.ID.Hex() + "\">" + strconv.FormatInt(good.Price, 10) + "تومان</p3></div><div id=\"addremove\"><button class=\"adder\" onclick=\"addgood('" + good.ID.Hex() + "')\"></button><button id=\"remover" + good.ID.Hex() + "\" class=\"remover\" onclick=\"removegood('" + good.ID.Hex() + "')\"></button></div></div>"
 
 		}
 		fmt.Fprintf(w, response)

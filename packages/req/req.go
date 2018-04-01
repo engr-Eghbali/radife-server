@@ -4,7 +4,7 @@ import (
 	"log"
 
 	mgo "gopkg.in/mgo.v2"
-	"mgo.v2/bson"
+	"gopkg.in/mgo.v2/bson"
 )
 
 //////////////////////preview of each shop/////////////////////////
@@ -29,11 +29,11 @@ type PreShop struct {
 /////////////////////////////////////each good info////////////////////
 
 type Good struct {
-	ID    bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Name  string        `json:"name"`
-	Price int64         `json:"price"`
-	Pic   string        `json:"pic"`
-	Info  string        `json:"detail"`
+	ID     bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Name   string        `json:"name"`
+	Price  int64         `json:"price"`
+	Pic    string        `json:"pic"`
+	Detail string        `json:"detail"`
 }
 
 ///////////////////////////////////////////////////////////////////////////
