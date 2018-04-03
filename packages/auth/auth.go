@@ -35,6 +35,8 @@ type user struct {
 	Favorit []string `json:"favorit"`
 
 	Wallet string `json:"wallet"`
+
+	Promo string `json:"promo"`
 }
 
 /////////////////////////////verify phone number/////////////////////////////////
@@ -62,7 +64,7 @@ func Verify_phone(phone string) (verify_code string) {
 		inlog := []string{"null", "null"}
 		infav := []string{"null", "null"}
 		log.Print(err)
-		err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0"})
+		err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0"})
 		log.Print("\nnew user submited:" + phone + "\n")
 		return "12345"
 	} else {
