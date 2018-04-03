@@ -126,7 +126,7 @@ type Shop struct {
 ///////////////////////////////////////////////////////////////////////////
 
 ////////////////calculate delivery cost////////////////////////////////////
-func calcDelivery(userInfoX string, userInfoY string, shopInfoX string, shopInfoy string) {
+func calcDelivery(userInfoX string, userInfoY string, shopInfoX string, shopInfoy string) (deliveryCost int64) {
 
 	log.Print(userInfoX + "&" + userInfoY + "&" + shopInfoX + "&" + shopInfoy + "\n")
 	return 5000
@@ -250,9 +250,10 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 	var basketTotal int64
 	var shopID string
 	var userInfo user
-	var deliveryCost string
+	var deliveryCost int64
 	var shopInfo Shop
-	var offSale string
+	var offSale int64
+	var promoTemp int64
 
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
@@ -277,7 +278,7 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 
 	} else {
 
-		basketTotal = order.Total
+		basketTotal, _ = strconv.ParseInt(order.Total, 10, 64)
 		shopID = order.Shop
 		c = session.DB("goods").C(cat)
 
@@ -285,9 +286,9 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 		for i, element := range order.Cart {
 
 			NoGood := strings.Split(element, "@")
-			items[i].No = NoGood[0]
-			items[i].ID = NoGood[1]
-			err2 := c.FindId(bson.ObjectIdHex(items[i].ID)).One(&goodTemp)
+			itemsTemp[i].No = NoGood[0]
+			itemsTemp[i].ID = NoGood[1]
+			err2 := c.FindId(bson.ObjectIdHex(itemsTemp[i].ID)).One(&goodTemp)
 
 			if err2 != nil {
 				log.Print("\n get  element  query failed:\n")
@@ -296,8 +297,8 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 
 			} else {
 
-				items[i].Name = goodTemp.Name
-				items[i].Price = goodTemp.Price
+				itemsTemp[i].Name = goodTemp.Name
+				itemsTemp[i].Price = goodTemp.Price
 			}
 
 		}
@@ -313,7 +314,7 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 
 		} else {
 
-			promo = userInfo.Promo
+			promoTemp, _ = strconv.ParseInt(userInfo.Promo, 10, 64)
 		}
 		///////get shop info
 		c = session.DB("shopinfo").C(cat)
@@ -327,8 +328,21 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 
 		} else {
 
+			offSale = shopInfo.Off
 			deliveryCost = calcDelivery(userInfo.X, userInfo.Y, shopInfo.X, shopInfo.y)
 		}
+
+		if deliveryCost > promoTemp {
+
+			total = deliveryCost - promoTemp + (basketTotal * (offSale / 100))
+
+		} else {
+
+			total = basketTotal * (offSale / 100)
+
+		}
+
+		return itemsTemp, strconv.FormatInt(promoTemp, 10), strconv.FormatInt(deliveryCost, 10), strconv.FormatInt(offSale, 10), strconv.FormatInt(total, 10)
 
 	}
 
