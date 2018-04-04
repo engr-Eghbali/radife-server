@@ -18,7 +18,7 @@ type PreShop struct {
 
 	Phone string `json:"phone"`
 
-	Stars int64 `json:"star"`
+	Stars string `json:"star"`
 
 	Avatar string `json:"avatar"`
 
@@ -34,7 +34,7 @@ type PreShop struct {
 type Good struct {
 	ID     bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Name   string        `json:"name"`
-	Price  int64         `json:"price"`
+	Price  string        `json:"price"`
 	Pic    string        `json:"pic"`
 	Detail string        `json:"detail"`
 }
@@ -47,7 +47,7 @@ type Order struct {
 	Shop         string   `json:"shop"`
 	Courier      string   `json:"courier"`
 	Cart         []string `json:"cart"`
-	Total        int64    `json:"total"`
+	Total        string   `json:"total"`
 	DateIn       string   `json:"date-in"`
 	TimeIn       string   `json:"time-in"`
 	DateOut      string   `json:"date-out"`
@@ -116,11 +116,11 @@ type Shop struct {
 
 	Off string `json:"off"`
 
-	Delivery int64 `json:"delivery"`
+	Delivery string `json:"delivery"`
 
-	X int64 `json:"x"`
+	X string `json:"x"`
 
-	Y int64 `json:"y"`
+	Y string `json:"y"`
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 	originy := "0"
 	destinationx := x
 	destinationy := y
-	totalPrice, _ := strconv.ParseInt(total, 10, 64)
+	totalPrice := total
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
@@ -242,13 +242,12 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 }
 
 ////////////////////////get from DB and process factor////////////////////////////
-func Get_factor(customer, cat) (items []recep, promo string, delivery string, off string, total string) {
+func Get_factor(customer string, cat string) (items []Recep, promo string, delivery string, off string, total string) {
 
 	var order Order
 	var itemsTemp []Recep
 	var goodTemp Good
 	var basketTotal int64
-	var shopID string
 	var userInfo user
 	var deliveryCost int64
 	var shopInfo Shop
@@ -261,7 +260,7 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return nil, "", "", "", nil
+		return nil, "", "", "", ""
 	}
 
 	/////////get order info
@@ -274,12 +273,11 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 
 		log.Print("\n order query failed:\n")
 		log.Print(err)
-		return nil, "", "", "", nil
+		return nil, "", "", "", ""
 
 	} else {
 
 		basketTotal, _ = strconv.ParseInt(order.Total, 10, 64)
-		shopID = order.Shop
 		c = session.DB("goods").C(cat)
 
 		///////get goods info for each element in cart
@@ -293,7 +291,7 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 			if err2 != nil {
 				log.Print("\n get  element  query failed:\n")
 				log.Print(err2)
-				return nil, "", "", "", nil
+				return nil, "", "", "", ""
 
 			} else {
 
@@ -310,7 +308,7 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 
 			log.Print("\n get  user  query failed:\n")
 			log.Print(err3)
-			return nil, "", "", "", nil
+			return nil, "", "", "", ""
 
 		} else {
 
@@ -324,25 +322,25 @@ func Get_factor(customer, cat) (items []recep, promo string, delivery string, of
 
 			log.Print("\n get  shop  query failed:\n")
 			log.Print(err4)
-			return nil, "", "", "", nil
+			return nil, "", "", "", ""
 
 		} else {
 
-			offSale = shopInfo.Off
-			deliveryCost = calcDelivery(userInfo.X, userInfo.Y, shopInfo.X, shopInfo.y)
+			offSale, _ = strconv.ParseInt(shopInfo.Off, 10, 64)
+			deliveryCost = calcDelivery(userInfo.X, userInfo.Y, shopInfo.X, shopInfo.Y)
 		}
 
 		if deliveryCost > promoTemp {
 
-			total = deliveryCost - promoTemp + (basketTotal * (offSale / 100))
+			total = strconv.FormatInt(deliveryCost-promoTemp+(basketTotal*(offSale/100)), 10)
 
 		} else {
 
-			total = basketTotal * (offSale / 100)
+			total = strconv.FormatInt(basketTotal*(offSale/100), 10)
 
 		}
 
-		return itemsTemp, strconv.FormatInt(promoTemp, 10), strconv.FormatInt(deliveryCost, 10), strconv.FormatInt(offSale, 10), strconv.FormatInt(total, 10)
+		return itemsTemp, strconv.FormatInt(promoTemp, 10), strconv.FormatInt(deliveryCost, 10), strconv.FormatInt(offSale, 10), total
 
 	}
 

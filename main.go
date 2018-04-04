@@ -98,6 +98,7 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 		var shops []req.PreShop
 		var ranking string
 		var i int64 = 0
+		var stars int64
 		r.ParseForm()
 		cat := r.Form["category"][0]
 		shops = req.Get_category(cat)
@@ -106,12 +107,14 @@ func category_ctrl(w http.ResponseWriter, r *http.Request) {
 
 			offer := shop.Off + "%%تخفیف"
 			delivery := "ارسال رایگان"
+			stars, _ = strconv.ParseInt(shop.Stars, 10, 64)
+
 			if shop.Delivery != 0 {
 				delivery = strconv.FormatInt(shop.Delivery, 10) + "هزینه ارسال"
 			}
 			for i < 6 {
 
-				if shop.Stars > i {
+				if stars > i {
 					ranking = ranking + "<span class=\"glyphicon glyphicon-star-empty\"></span>"
 				} else {
 					ranking = ranking + "<span class=\"glyphicon glyphicon-star\"></span>"
@@ -148,7 +151,7 @@ func goods_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		for _, good := range goods {
 
-			response = response + "<div class=\"good\"><img id=\"goodicon" + good.ID.Hex() + "\"class=\"goodicon\" src=\"" + good.Pic + "\"><div class=\"goodinfo\"></br></br><p1 class=\"goodname\" id=\"goodname" + good.ID.Hex() + "\">" + good.Name + "</p1></br><p2 class=\"gooddetail\" id=\"gooddetail" + good.ID.Hex() + "\">" + good.Detail + "</p2></br><p3 class=\"goodprice\" id=\"goodprice" + good.ID.Hex() + "\">" + strconv.FormatInt(good.Price, 10) + "تومان</p3></div><div id=\"addremove\"><button class=\"adder\" onclick=\"addgood('" + good.ID.Hex() + "')\"></button><button id=\"remover" + good.ID.Hex() + "\" class=\"remover\" onclick=\"removegood('" + good.ID.Hex() + "')\"></button></div></div>"
+			response = response + "<div class=\"good\"><img id=\"goodicon" + good.ID.Hex() + "\"class=\"goodicon\" src=\"" + good.Pic + "\"><div class=\"goodinfo\"></br></br><p1 class=\"goodname\" id=\"goodname" + good.ID.Hex() + "\">" + good.Name + "</p1></br><p2 class=\"gooddetail\" id=\"gooddetail" + good.ID.Hex() + "\">" + good.Detail + "</p2></br><p3 class=\"goodprice\" id=\"goodprice" + good.ID.Hex() + "\">" + good.Price + "تومان</p3></div><div id=\"addremove\"><button class=\"adder\" onclick=\"addgood('" + good.ID.Hex() + "')\"></button><button id=\"remover" + good.ID.Hex() + "\" class=\"remover\" onclick=\"removegood('" + good.ID.Hex() + "')\"></button></div></div>"
 
 		}
 		fmt.Fprintf(w, response)
