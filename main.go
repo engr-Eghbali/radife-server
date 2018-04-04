@@ -169,7 +169,6 @@ func cart_ctrl(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
 		var response string
-		var order req.Order
 
 		r.ParseForm()
 

@@ -253,6 +253,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 	var shopInfo Shop
 	var offSale int64
 	var promoTemp int64
+	var singleItem Recep
 
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
@@ -267,7 +268,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("orderinfo").C("order")
-	err = c.Find(bson.M{"customer": customer}).All(&order)
+	err = c.Find(bson.M{"customer": customer}).One(&order)
 
 	if err != nil {
 
@@ -278,15 +279,20 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 	} else {
 
 		basketTotal, _ = strconv.ParseInt(order.Total, 10, 64)
+
 		c = session.DB("goods").C(cat)
 
 		///////get goods info for each element in cart
-		for i, element := range order.Cart {
+		for _, element := range order.Cart {
 
+			log.Print(element)
+			if element == "undefined" {
+				break
+			}
 			NoGood := strings.Split(element, "@")
-			itemsTemp[i].No = NoGood[0]
-			itemsTemp[i].ID = NoGood[1]
-			err2 := c.FindId(bson.ObjectIdHex(itemsTemp[i].ID)).One(&goodTemp)
+			singleItem.No = NoGood[0]
+			singleItem.ID = NoGood[1]
+			err2 := c.FindId(bson.ObjectIdHex(singleItem.ID)).One(&goodTemp)
 
 			if err2 != nil {
 				log.Print("\n get  element  query failed:\n")
@@ -295,9 +301,11 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 
 			} else {
 
-				itemsTemp[i].Name = goodTemp.Name
-				itemsTemp[i].Price = goodTemp.Price
+				singleItem.Name = goodTemp.Name
+				singleItem.Price = goodTemp.Price
 			}
+
+			itemsTemp = append(itemsTemp, singleItem)
 
 		}
 
@@ -316,6 +324,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 		}
 		///////get shop info
 		c = session.DB("shopinfo").C(cat)
+		log.Print(order.Shop)
 		err4 := c.Find(bson.M{"phone": order.Shop}).One(&shopInfo)
 
 		if err4 != nil {
@@ -340,6 +349,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 
 		}
 
+		log.Print(strconv.FormatInt(promoTemp, 10) + strconv.FormatInt(deliveryCost, 10) + strconv.FormatInt(offSale, 10) + total)
 		return itemsTemp, strconv.FormatInt(promoTemp, 10), strconv.FormatInt(deliveryCost, 10), strconv.FormatInt(offSale, 10), total
 
 	}
