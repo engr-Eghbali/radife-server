@@ -220,7 +220,7 @@ func factor_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		for _, item := range items {
 
-			response = response + "<div class=\"factorrow\" id=\"factorgood" + item.ID + "\"><button class=\"addfactor\" id=\"addgood" + item.ID + "\"></button><p1>" + item.No + "</p1><button class=\"removefactor\" id=\"removegood" + item.ID + "\"></button><p3>" + item.Price + "تومان</p3><p2>" + item.Name + "</p2></div>"
+			response = response + "<div class=\"factorrow\" id=\"factorgood" + item.ID + "\"><button class=\"addfactor\" id=\"addgood" + item.ID + "\" onclick=\"addgood('" + item.ID + "')\"></button><p1 id=\"no" + item.ID + "\">" + item.No + "</p1><button class=\"removefactor\" id=\"removegood" + item.ID + "\" onclick=\"removegood('" + item.ID + "')\"></button><p3>" + item.Price + "تومان</p3><p2>" + item.Name + "</p2></div>"
 
 		}
 

@@ -252,7 +252,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 	var deliveryCost float64
 	var shopInfo Shop
 	var offSale float64
-	var promoTemp float64
+	var promoTemp float64 = 0
 	var singleItem Recep
 
 	session, err := mgo.Dial("127.0.0.1")
