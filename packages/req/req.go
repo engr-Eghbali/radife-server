@@ -126,7 +126,7 @@ type Shop struct {
 ///////////////////////////////////////////////////////////////////////////
 
 ////////////////calculate delivery cost////////////////////////////////////
-func calcDelivery(userInfoX string, userInfoY string, shopInfoX string, shopInfoy string) (deliveryCost int64) {
+func calcDelivery(userInfoX string, userInfoY string, shopInfoX string, shopInfoy string) (deliveryCost float64) {
 
 	log.Print(userInfoX + "&" + userInfoY + "&" + shopInfoX + "&" + shopInfoy + "\n")
 	return 5000
@@ -247,12 +247,12 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 	var order Order
 	var itemsTemp []Recep
 	var goodTemp Good
-	var basketTotal int64
+	var basketTotal float64
 	var userInfo user
-	var deliveryCost int64
+	var deliveryCost float64
 	var shopInfo Shop
-	var offSale int64
-	var promoTemp int64
+	var offSale float64
+	var promoTemp float64
 	var singleItem Recep
 
 	session, err := mgo.Dial("127.0.0.1")
@@ -278,7 +278,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 
 	} else {
 
-		basketTotal, _ = strconv.ParseInt(order.Total, 10, 64)
+		basketTotal, _ = strconv.ParseFloat(order.Total, 64)
 
 		c = session.DB("goods").C(cat)
 
@@ -320,7 +320,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 
 		} else {
 
-			promoTemp, _ = strconv.ParseInt(userInfo.Promo, 10, 64)
+			promoTemp, _ = strconv.ParseFloat(userInfo.Promo, 64)
 		}
 		///////get shop info
 		c = session.DB("shopinfo").C(cat)
@@ -335,22 +335,24 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 
 		} else {
 
-			offSale, _ = strconv.ParseInt(shopInfo.Off, 10, 64)
+			offSale, _ = strconv.ParseFloat(shopInfo.Off, 64)
 			deliveryCost = calcDelivery(userInfo.X, userInfo.Y, shopInfo.X, shopInfo.Y)
 		}
 
 		if deliveryCost > promoTemp {
 
-			total = strconv.FormatInt(deliveryCost-promoTemp+(basketTotal*(offSale/100)), 10)
+			total = strconv.FormatFloat(deliveryCost-promoTemp+(basketTotal*((100-offSale)/100)), 'f', 0, 64)
 
 		} else {
 
-			total = strconv.FormatInt(basketTotal*(offSale/100), 10)
-
+			total = strconv.FormatFloat(basketTotal*((100-offSale)/100), 'f', 0, 64)
+			log.Print("\ncond2:\n")
+			log.Print(total)
+			log.Print(basketTotal)
+			log.Print(offSale)
 		}
 
-		log.Print(strconv.FormatInt(promoTemp, 10) + strconv.FormatInt(deliveryCost, 10) + strconv.FormatInt(offSale, 10) + total)
-		return itemsTemp, strconv.FormatInt(promoTemp, 10), strconv.FormatInt(deliveryCost, 10), strconv.FormatInt(offSale, 10), total
+		return itemsTemp, userInfo.Promo, strconv.FormatFloat(deliveryCost, 'f', 0, 64), shopInfo.Off, total
 
 	}
 
