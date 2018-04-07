@@ -136,3 +136,51 @@ func Update_add(phone string, add string, x string, y string) (flg bool) {
 	}
 
 }
+////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////log out func//////////////////////////////////////////
+
+func Logout(phone string, key string) (flg bool) {
+
+	result user
+	session, err := mgo.Dial("127.0.0.1")
+
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return false
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("userinfo").C("users")
+
+	
+	err = c.Find(bson.M{"phone": phone}).Select(bson.M{"key": key}).One(&result)
+	if err != nil {
+	
+	 log.Printf("!! logout failed,DB phone+key query failed")
+	 return false
+	
+	 }else{
+		
+	colQuerier := bson.M{"phone": phone}
+	change := bson.M{"$set": bson.M{"login": 0,"key":"nil"}}
+	err = c.Update(colQuerier, change)
+	
+	if err != nil {
+		log.Print("\nupdate key failed...\n")
+		log.Print(err)
+		return false
+
+	} else {
+		return true
+	}
+
+
+	}
+
+
+}
