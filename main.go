@@ -388,6 +388,6 @@ func main() {
 	http.Handle("/goods", app4)
 	http.Handle("/cart", app5)
 	http.Handle("/factor", app6)
-	log.Fatal(http.ListenAndServe(":80", nil))
+	log.Fatal(http.ListenAndServe(":8081", nil))
 
 }

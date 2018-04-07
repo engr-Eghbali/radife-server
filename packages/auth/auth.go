@@ -37,6 +37,8 @@ type user struct {
 	Wallet string `json:"wallet"`
 
 	Promo string `json:"promo"`
+
+	Login int32 `json:"login"`
 }
 
 /////////////////////////////verify phone number/////////////////////////////////
@@ -61,16 +63,31 @@ func Verify_phone(phone string) (verify_code string) {
 
 	if err != nil {
 
-		inlog := []string{"null", "null"}
-		infav := []string{"null", "null"}
-		log.Print(err)
-		err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0"})
-		log.Print("\nnew user submited:" + phone + "\n")
-		return "12345"
+		if err.Error() == "not found" {
+
+			inlog := []string{"null", "null"}
+			infav := []string{"null", "null"}
+			log.Print(err)
+			err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0", login: "1"})
+			log.Print("\nnew user submited:" + phone + "\n")
+			//build crypted verification code and return and send *SMS*
+			return "12345"
+		} else {
+			log.Print("++submit auth@user database error")
+			log.Print(err)
+			return "-1"
+		}
+
 	} else {
 
-		log.Print("\nduplicate user try to submit...\n")
-		return "0"
+		if result.Login == 0 {
+			log.Print("\n**++duplicate user try to submit...++**\n")
+			return "0"
+		} else {
+			log.Print("\nlog outed user come back...\n")
+			//build crypted verification code and return and send *SMS*
+			return "12345"
+		}
 	}
 
 }

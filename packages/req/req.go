@@ -342,14 +342,16 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 		if deliveryCost > promoTemp {
 
 			total = strconv.FormatFloat(deliveryCost-promoTemp+(basketTotal*((100-offSale)/100)), 'f', 0, 64)
+			log.Print("\ncond1:\n")
+			log.Print(total)
+			log.Print(basketTotal)
+			log.Print(offSale)
+			log.Print(deliveryCost - promoTemp + (basketTotal * ((100 - offSale) / 100)))
 
 		} else {
 
 			total = strconv.FormatFloat(basketTotal*((100-offSale)/100), 'f', 0, 64)
-			log.Print("\ncond2:\n")
-			log.Print(total)
-			log.Print(basketTotal)
-			log.Print(offSale)
+
 		}
 
 		return itemsTemp, userInfo.Promo, strconv.FormatFloat(deliveryCost, 'f', 0, 64), shopInfo.Off, total
