@@ -68,9 +68,10 @@ func Verify_phone(phone string) (verify_code string) {
 			inlog := []string{"null", "null"}
 			infav := []string{"null", "null"}
 			log.Print(err)
-			err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0", login: "1"})
-			log.Print("\nnew user submited:" + phone + "\n")
 			//build crypted verification code and return and send *SMS*
+			err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0", Login: 1, Key: "12345"})
+			log.Print("\nnew user submited:" + phone + "\n")
+
 			return "12345"
 		} else {
 			log.Print("++submit auth@user database error")
@@ -80,12 +81,23 @@ func Verify_phone(phone string) (verify_code string) {
 
 	} else {
 
-		if result.Login == 0 {
+		if result.Login == 1 {
 			log.Print("\n**++duplicate user try to submit...++**\n")
 			return "0"
 		} else {
 			log.Print("\nlog outed user come back...\n")
 			//build crypted verification code and return and send *SMS*
+			// Update
+			colQuerier := bson.M{"phone": phone}
+			change := bson.M{"$set": bson.M{"key:", "12345"}}
+			err = c.Update(colQuerier, change)
+			if err != nil {
+				log.Print("query update key failed on:")
+				log.Print(phone)
+				return -1
+			} else {
+				return "12345"
+			}
 			return "12345"
 		}
 	}
