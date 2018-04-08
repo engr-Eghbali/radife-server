@@ -39,6 +39,8 @@ type user struct {
 	Promo string `json:"promo"`
 
 	Login int32 `json:"login"`
+
+	Key int32 `json:"key"`
 }
 
 /////////////////////////////verify phone number/////////////////////////////////
@@ -69,7 +71,7 @@ func Verify_phone(phone string) (verify_code string) {
 			infav := []string{"null", "null"}
 			log.Print(err)
 			//build crypted verification code and return and send *SMS*
-			err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0", Login: 1, Key: "12345"})
+			err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0", Login: 1, Key: 12345})
 			log.Print("\nnew user submited:" + phone + "\n")
 
 			return "12345"
@@ -89,12 +91,12 @@ func Verify_phone(phone string) (verify_code string) {
 			//build crypted verification code and return and send *SMS*
 			// Update
 			colQuerier := bson.M{"phone": phone}
-			change := bson.M{"$set": bson.M{"key:", "12345"}}
+			change := bson.M{"$set": bson.M{"key:": "12345"}}
 			err = c.Update(colQuerier, change)
 			if err != nil {
 				log.Print("query update key failed on:")
 				log.Print(phone)
-				return -1
+				return "-1"
 			} else {
 				return "12345"
 			}
@@ -136,13 +138,14 @@ func Update_add(phone string, add string, x string, y string) (flg bool) {
 	}
 
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////log out func//////////////////////////////////////////
 
 func Logout(phone string, key string) (flg bool) {
 
-	result user
+	var result user
 	session, err := mgo.Dial("127.0.0.1")
 
 	if err != nil {
@@ -157,30 +160,27 @@ func Logout(phone string, key string) (flg bool) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("userinfo").C("users")
 
-	
 	err = c.Find(bson.M{"phone": phone}).Select(bson.M{"key": key}).One(&result)
 	if err != nil {
-	
-	 log.Printf("!! logout failed,DB phone+key query failed")
-	 return false
-	
-	 }else{
-		
-	colQuerier := bson.M{"phone": phone}
-	change := bson.M{"$set": bson.M{"login": 0,"key":"nil"}}
-	err = c.Update(colQuerier, change)
-	
-	if err != nil {
-		log.Print("\nupdate key failed...\n")
-		log.Print(err)
+
+		log.Printf("!! logout failed,DB phone+key query failed")
 		return false
 
 	} else {
-		return true
+
+		colQuerier := bson.M{"phone": phone}
+		change := bson.M{"$set": bson.M{"login": 0, "key": "nil"}}
+		err = c.Update(colQuerier, change)
+
+		if err != nil {
+			log.Print("\nupdate key failed...\n")
+			log.Print(err)
+			return false
+
+		} else {
+			return true
+		}
+
 	}
-
-
-	}
-
 
 }

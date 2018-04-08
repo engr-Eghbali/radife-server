@@ -55,41 +55,37 @@ func submit_ctrl(w http.ResponseWriter, r *http.Request) {
 
 ///////////////////logout control////////////////////////////////////////////////////////////////
 
-func setAddress_ctrl(w http.ResponseWriter, r *http.Request) {
+func logout_ctrl(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if r.Method == "POST" {
 
-		var key,phone string
+		var key, phone string
 		r.ParseForm()
-		phone=r.Form["phone"][0]
-		key=r.Form["key"][0]
+		phone = r.Form["phone"][0]
+		key = r.Form["key"][0]
 
 		if len(phone) == 11 {
 
-			flg:=auth.Logout(phone,key)
+			flg := auth.Logout(phone, key)
 
-
-			if flg{
-				fmt.Fprintf(w,"1")
-			}else{
-				fmt.Fprintf(w,"0")
-			}
-			
-
+			if flg {
+				fmt.Fprintf(w, "1")
+			} else {
+				fmt.Fprintf(w, "0")
 			}
 
 		} else {
 
-			fmt.Fprintf(w,"-1")
+			fmt.Fprintf(w, "-1")
 		}
 
 	}
 }
-//////////////////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////update control///////////////////////////////////////////////////////////
 func setAddress_ctrl(w http.ResponseWriter, r *http.Request) {
@@ -450,6 +446,7 @@ func main() {
 	http.Handle("/goods", app4)
 	http.Handle("/cart", app5)
 	http.Handle("/factor", app6)
+	http.Handle("/logout", app7)
 	log.Fatal(http.ListenAndServe(":8081", nil))
 
 }
