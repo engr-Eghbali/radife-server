@@ -367,11 +367,20 @@ func CancelOrder(customer string) (flg bool) {
 
 	var order Order
 
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return true
+	}
+
 	defer session.Close()
 	session.SetSafe(&mgo.Safe{})
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("orderinfo").C("order")
-	err := c.Find(bson.M{"customer": customer}).One(&order)
+	err = c.Find(bson.M{"customer": customer}).One(&order)
 
 	if err != nil {
 
@@ -392,7 +401,7 @@ func CancelOrder(customer string) (flg bool) {
 		} else {
 
 			c = session.DB("orderinfo").C("order")
-			err = collection.Remove(bson.M{"customer": customer})
+			err = c.Remove(bson.M{"customer": customer})
 
 			if err != nil {
 				fmt.Printf("\norder remove fail %v\n", err)

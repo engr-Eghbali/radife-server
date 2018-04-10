@@ -271,15 +271,13 @@ func factor_ctrl(w http.ResponseWriter, r *http.Request) {
 
 ///////////////////////////////cancel order request control/////////////////////////
 
-func cancelOrder(w http.ResponseWriter, r *http.Request) {
+func cancelOrder_ctrl(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if r.Method == "POST" {
 
-		var temp string
-		var response string
 		r.ParseForm()
 
 		customer := r.Form["customer"][0]
@@ -288,7 +286,7 @@ func cancelOrder(w http.ResponseWriter, r *http.Request) {
 
 		if key == "radife22" && len(cat) > 2 {
 
-			flg = req.CancelOrder(customer)
+			flg := req.CancelOrder(customer)
 			if flg {
 				log.Print("order canceled by user:")
 				log.Print(customer)
