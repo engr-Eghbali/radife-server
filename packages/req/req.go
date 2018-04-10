@@ -375,7 +375,7 @@ func CancelOrder(customer string) (flg bool) {
 
 	if err != nil {
 
-		log.Print("\n order query failed:\n")
+		log.Print("\n cancel order query failed:\n")
 		log.Print(err)
 		return false
 
@@ -406,8 +406,5 @@ func CancelOrder(customer string) (flg bool) {
 		}
 	}
 	// Error check on every access
-
-	// Get collection
-	collection := session.DB("orderinfo").C("people")
 
 }
