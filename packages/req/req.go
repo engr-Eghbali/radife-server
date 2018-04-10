@@ -43,22 +43,21 @@ type Good struct {
 
 ////////////////////////////////////each cart info////////////////////////
 type Order struct {
-	ID           bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Customer     string        `json:"customer"`
-	Shop         string        `json:"shop"`
-	Courier      string        `json:"courier"`
-	Cart         []string      `json:"cart"`
-	Total        string        `json:"total"`
-	DateIn       string        `json:"date-in"`
-	TimeIn       string        `json:"time-in"`
-	DateOut      string        `json:"date-out"`
-	TimeOut      string        `json:"time-out"`
-	OriginX      string        `json:"originX"`
-	OriginY      string        `json:"originY"`
-	DestinationX string        `json:"destinationX"`
-	DestinationY string        `json:"destinationY"`
-	Recieved     int32         `json:"recieved"`
-	Pay          int32         `json:"pay"`
+	Customer     string   `json:"customer"`
+	Shop         string   `json:"shop"`
+	Courier      string   `json:"courier"`
+	Cart         []string `json:"cart"`
+	Total        string   `json:"total"`
+	DateIn       string   `json:"date-in"`
+	TimeIn       string   `json:"time-in"`
+	DateOut      string   `json:"date-out"`
+	TimeOut      string   `json:"time-out"`
+	OriginX      string   `json:"originX"`
+	OriginY      string   `json:"originY"`
+	DestinationX string   `json:"destinationX"`
+	DestinationY string   `json:"destinationY"`
+	Recieved     int32    `json:"recieved"`
+	Pay          int32    `json:"pay"`
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -205,7 +204,7 @@ func Get_goods(shopid string, cat string) (goods []Good) {
 
 //////////////////////////set order/////////////////////////////////
 
-func Send_cart(shopID string, customer string, x string, y string, add string, total string, cart string) (flg string) {
+func Send_cart(shopID string, customer string, x string, y string, add string, total string, cart string) (flg bool) {
 
 	order_array := strings.Split(cart, "#")
 	originx := "0"
@@ -213,39 +212,37 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 	destinationx := x
 	destinationy := y
 	totalPrice := total
-	id := bson.NewObjectId()
-
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return "0"
+		return false
 	} else {
 
 		defer session.Close()
 		session.SetMode(mgo.Monotonic, true)
 		c := session.DB("orderinfo").C("order")
 
-		err = c.Insert(&Order{ID: id, Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: time.Now().Local().Format("2006-01-02"), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
+		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: time.Now().Local().Format("2006-01-02"), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
 
 		if err != nil {
 
 			log.Print("\n !!!!!!!!! new order failed by:" + customer + "!!!!!!!!\n")
-			return "0"
+			return false
 
 		} else {
 
 			log.Print("\nnew order submited by:" + customer + "\n")
-			return id.Hex()
+			return true
 		}
 
 	}
 }
 
 ////////////////////////get from DB and process factor////////////////////////////
-func Get_factor(orderID string, cat string) (items []Recep, promo string, delivery string, off string, total string) {
+func Get_factor(customer string, cat string) (items []Recep, promo string, delivery string, off string, total string) {
 
 	var order Order
 	var itemsTemp []Recep
@@ -271,7 +268,7 @@ func Get_factor(orderID string, cat string) (items []Recep, promo string, delive
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("orderinfo").C("order")
-	err = c.Find(bson.M{"ID": ObjectIdHex(orderID)}).One(&order)
+	err = c.Find(bson.M{"customer": customer}).One(&order)
 
 	if err != nil {
 

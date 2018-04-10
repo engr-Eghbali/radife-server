@@ -214,10 +214,10 @@ func cart_ctrl(w http.ResponseWriter, r *http.Request) {
 		total := r.Form["total"][0]
 		cart := r.Form["cart"][0]
 
-		resp := req.Send_cart(shopID, customer, x, y, add, total, cart)
+		flg := req.Send_cart(shopID, customer, x, y, add, total, cart)
 
-		if resp != "0" {
-			response = resp
+		if flg {
+			response = "1"
 		} else {
 
 			response = "0"
@@ -247,10 +247,10 @@ func factor_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		r.ParseForm()
 
-		order := r.Form["order"][0]
+		customer := r.Form["customer"][0]
 		cat := r.Form["cat"][0]
 
-		items, promo, delivery, off, total = req.Get_factor(order, cat)
+		items, promo, delivery, off, total = req.Get_factor(customer, cat)
 
 		for _, item := range items {
 
