@@ -1,6 +1,7 @@
 package magic
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -357,5 +358,56 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 		return itemsTemp, userInfo.Promo, strconv.FormatFloat(deliveryCost, 'f', 0, 64), shopInfo.Off, total
 
 	}
+
+}
+
+///////////////////////////////////////////////////////////////////
+///////////////////cancel an order///////////////////////////////
+func CancelOrder(customer string) (flg bool) {
+
+	var order Order
+
+	defer session.Close()
+	session.SetSafe(&mgo.Safe{})
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("orderinfo").C("order")
+	err := c.Find(bson.M{"customer": customer}).One(&order)
+
+	if err != nil {
+
+		log.Print("\n order query failed:\n")
+		log.Print(err)
+		return false
+
+	} else {
+
+		c = session.DB("orderinfo").C("canceled")
+		err = c.Insert(&order)
+
+		if err != nil {
+
+			log.Print("\n updated canceled order DB Failed" + customer + "!!!!!!!!\n")
+			return false
+
+		} else {
+
+			c = session.DB("orderinfo").C("order")
+			err = collection.Remove(bson.M{"customer": customer})
+
+			if err != nil {
+				fmt.Printf("\norder remove fail %v\n", err)
+				return false
+			} else {
+
+				log.Print("\norder canceled by user:" + customer + "!!!!!!!!\n")
+				return true
+			}
+
+		}
+	}
+	// Error check on every access
+
+	// Get collection
+	collection := session.DB("orderinfo").C("people")
 
 }
