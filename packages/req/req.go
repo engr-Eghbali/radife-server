@@ -73,7 +73,7 @@ type Recep struct {
 
 ///////////////////////////////////////////////////////////////////////////
 
-type user struct {
+type User struct {
 	ID bson.ObjectId `json:"id" bson:"_id,omitempty"`
 
 	Phone string `json:"phone"`
@@ -249,7 +249,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 	var itemsTemp []Recep
 	var goodTemp Good
 	var basketTotal float64
-	var userInfo user
+	var userInfo User
 	var deliveryCost float64
 	var shopInfo Shop
 	var offSale float64
@@ -415,5 +415,31 @@ func CancelOrder(customer string) (flg bool) {
 		}
 	}
 	// Error check on every access
+
+}
+
+func Profile(customerId string) (person User) {
+
+	var userInfo User
+
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return true
+	}
+	defer session.Close()
+	session.SetSafe(&mgo.Safe{})
+	session.SetMode(mgo.Monotonic, true)
+	c = session.DB("userinfo").C("users")
+	err3 := c.Find(bson.M{"phone": customerId}).One(&userInfo)
+	if err3 != nil {
+
+		return userInfo
+	} else {
+		return nil
+	}
 
 }
