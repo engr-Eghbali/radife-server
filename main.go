@@ -316,7 +316,7 @@ func profile_ctrl(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 
 		r.ParseForm()
-		customer := r.Form["radifeCustomer"]["0"]
+		customer := r.Form["radifeCustomer"][0]
 		userInfo, flg = req.Profile(customer)
 		if flg {
 
@@ -329,6 +329,9 @@ func profile_ctrl(w http.ResponseWriter, r *http.Request) {
 
 			fmt.Fprintf(w, response)
 
+		} else {
+			log.Print("\nfailed to response")
+			fmt.Fprintf(w, "failed to load")
 		}
 
 	}

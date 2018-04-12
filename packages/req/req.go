@@ -421,7 +421,7 @@ func CancelOrder(customer string) (flg bool) {
 func Profile(customerId string) (person User, flg bool) {
 
 	var userInfo User
-
+	log.Print(customerId)
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
@@ -433,13 +433,18 @@ func Profile(customerId string) (person User, flg bool) {
 	defer session.Close()
 	session.SetSafe(&mgo.Safe{})
 	session.SetMode(mgo.Monotonic, true)
-	c = session.DB("userinfo").C("users")
+	c := session.DB("userinfo").C("users")
 	err3 := c.Find(bson.M{"phone": customerId}).One(&userInfo)
 	if err3 != nil {
 
-		return userInfo, true
-	} else {
+		log.Print("\nprofile 404:")
+		log.Print(customerId)
 		return userInfo, false
+	} else {
+		log.Print("\nprofile visited:")
+		log.Print(customerId)
+
+		return userInfo, true
 	}
 
 }

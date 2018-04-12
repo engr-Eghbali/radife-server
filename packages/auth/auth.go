@@ -71,7 +71,7 @@ func Verify_phone(phone string) (verify_code string) {
 			infav := []string{"null", "null"}
 			log.Print(err)
 			//build crypted verification code and return and send *SMS*
-			err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "b", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0", Login: 1, Key: 12345})
+			err = c.Insert(&user{Phone: phone, Name: "نام", Add: "آدرس", X: "0", Y: "0", Rank: "اول", Level: "1", Pending: "null", Avatar: "avatar.jpg", Log: inlog, Favorit: infav, Wallet: "0", Promo: "0", Login: 1, Key: 12345})
 			log.Print("\nnew user submited:" + phone + "\n")
 
 			return "12345"
