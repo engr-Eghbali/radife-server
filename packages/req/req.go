@@ -448,3 +448,31 @@ func Profile(customerId string) (person User, flg bool) {
 	}
 
 }
+
+func UpdateName(phone string, name string, x string, y string) (flg bool) {
+
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return false
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("userinfo").C("users")
+
+	colQuerier := bson.M{"phone": phone}
+	change := bson.M{"$set": bson.M{"name": name, "x": x, "y": y}}
+	err = c.Update(colQuerier, change)
+	if err != nil {
+		log.Print("\nupdate name failed...\n")
+		log.Print(err)
+		return false
+
+	} else {
+		return true
+	}
+}
