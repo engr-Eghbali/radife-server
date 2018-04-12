@@ -309,6 +309,7 @@ func cancelOrder_ctrl(w http.ResponseWriter, r *http.Request) {
 func profile_ctrl(w http.ResponseWriter, r *http.Request) {
 	var userInfo req.User
 	var response string
+	var flg bool
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
@@ -316,8 +317,8 @@ func profile_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		r.ParseForm()
 		customer := r.Form["radifeCustomer"]["0"]
-		userInfo = req.Profile(customer)
-		if userInfo != nil {
+		userInfo, flg = req.Profile(customer)
+		if flg {
 
 			response = "<div class=\"info\" id=\"showname\"><p3>" + userInfo.Name + "</p3></div>"
 			response = response + "<div class=\"info\" id=\"showphone\"><p3></p3></div>"

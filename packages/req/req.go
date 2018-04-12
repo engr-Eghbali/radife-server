@@ -418,7 +418,7 @@ func CancelOrder(customer string) (flg bool) {
 
 }
 
-func Profile(customerId string) (person User) {
+func Profile(customerId string) (person User, flg bool) {
 
 	var userInfo User
 
@@ -428,7 +428,7 @@ func Profile(customerId string) (person User) {
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return true
+		return userInfo, false
 	}
 	defer session.Close()
 	session.SetSafe(&mgo.Safe{})
@@ -437,9 +437,9 @@ func Profile(customerId string) (person User) {
 	err3 := c.Find(bson.M{"phone": customerId}).One(&userInfo)
 	if err3 != nil {
 
-		return userInfo
+		return userInfo, true
 	} else {
-		return nil
+		return userInfo, false
 	}
 
 }
