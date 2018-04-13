@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/yaa110/go-persian-calendar/ptime"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -30,6 +31,15 @@ type PreShop struct {
 
 ////////////////////////////////////////////////////////////////////////
 
+/////////////////////preview of orders/////////////////////////////////
+type PreOrderView{
+	
+	Total        string   `json:"total"`
+	DateIn       string   `json:"date-in"`
+	TimeIn       string   `json:"time-in"`
+	Recieved     int32    `json:"recieved"`
+
+}
 /////////////////////////////////////each good info////////////////////
 
 type Good struct {
@@ -226,7 +236,11 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 		session.SetMode(mgo.Monotonic, true)
 		c := session.DB("orderinfo").C("order")
 
-		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: time.Now().Local().Format("2006-01-02"), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
+		var t time.Time = time.Date(2016, time.January, 1, 12, 1, 1, 0, ptime.Iran())
+		// Get a new instance of ptime.Time using time.Time
+		pt := ptime.New(t)
+		now := pt.Date()
+		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: now.Format("yyyy/MMM/dd"), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
 
 		if err != nil {
 
@@ -389,7 +403,11 @@ func CancelOrder(customer string) (flg bool) {
 		return false
 
 	} else {
-
+		order.Recieved = -1
+		order.Pay = -1
+		order.Courier = "-1"
+		order.TimeOut = "-1"
+		order.DateOut = "-1"
 		c = session.DB("orderinfo").C("canceled")
 		err = c.Insert(&order)
 
@@ -475,4 +493,52 @@ func UpdateName(phone string, name string, x string, y string) (flg bool) {
 	} else {
 		return true
 	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////when user request history log //////////////////////////////////////////////
+func ShowHisrory(customer string)(list []PreOrderView,flg bool){
+
+	var orders []PreOrderView
+    var temp   []PreOrderView
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return orders,false
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	//fetch canceled orders
+	c := session.DB("orderinfo").C("canceled")
+	err = c.Find(bson.M{"customer": customer}).All(&temp)
+	if err ==nil{
+		orders=append(orders,temp)
+	}
+	///////fetch in progress orders
+	c = session.DB("orderinfo").C("inProgress")
+	err1 := c.Find(bson.M{"customer": customer}).All(&temp)
+	if err1 ==nil{
+		orders=append(orders,temp)
+	}
+	///fetch recieved orders
+	c := session.DB("orderinfo").C("recieved")
+	err2 := c.Find(bson.M{"customer": customer}).All(&temp)
+	if err2 ==nil{
+		orders=append(orders,temp)
+	}
+
+	if !(err && err1 && err2){
+		log.Print("\n log history visited:")
+		log.Print(customer)
+		return orders,true
+	}else{
+		log.Print("\n failed to quety preorderview:")
+		log.Print(customer)
+		return orders,false
+	}
+	
+
 }
