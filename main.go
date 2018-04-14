@@ -410,7 +410,7 @@ func history_ctrl(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 
-				response = "<div class=\"hisrow\" id=\"hisrowgood1\"><p4>" + strconv.Itoa(i) + "</p4><p5>" + order.DateIn + "<br>" + order.TimeIn + "</p5><p6>" + order.Total + "تومان</p6><p7>" + status + "</p7></div>"
+				response = response + "<div class=\"hisrow\" id=\"hisrowgood1\"><p4>" + strconv.Itoa(i) + "</p4><p5>" + order.DateIn + "<br>" + order.TimeIn + "</p5><p6>" + order.Total + "تومان</p6><p7>" + status + "</p7></div>"
 			}
 
 			fmt.Fprintf(w, response)

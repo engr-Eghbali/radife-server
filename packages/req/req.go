@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yaa110/go-persian-calendar/ptime"
+	"github.com/mostafah/go-jalali/jalali"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -235,11 +236,10 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 		session.SetMode(mgo.Monotonic, true)
 		c := session.DB("orderinfo").C("order")
 
-		var t time.Time = time.Date(2016, time.January, 1, 12, 1, 1, 0, ptime.Iran())
+		// "Printed on 1392/04/02"
 		// Get a new instance of ptime.Time using time.Time
-		pt := ptime.Unix(1454277270, 0, ptime.Iran())
 
-		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: pt.Format("yyyy/MMM/dd"), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
+		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: jalali.Strftime("%Y/%b/%d", time.Now()), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
 
 		if err != nil {
 
@@ -516,21 +516,27 @@ func ShowHisrory(customer string) (list []PreOrderView, flg bool) {
 	err = c.Find(bson.M{"customer": customer}).All(&temp)
 	if err == nil {
 		orders = append(orders, temp...)
+	} else {
+		log.Print(err)
 	}
 	///////fetch in progress orders
 	c = session.DB("orderinfo").C("inProgress")
 	err1 := c.Find(bson.M{"customer": customer}).All(&temp)
 	if err1 == nil {
 		orders = append(orders, temp...)
+	} else {
+		log.Print(err1)
 	}
 	///fetch recieved orders
 	c = session.DB("orderinfo").C("recieved")
 	err2 := c.Find(bson.M{"customer": customer}).All(&temp)
 	if err2 == nil {
 		orders = append(orders, temp...)
+	} else {
+		log.Print(err2)
 	}
 
-	if !(err == nil && err1 == nil && err2 == nil) {
+	if err == nil || err1 == nil || err2 == nil {
 		log.Print("\n log history visited:")
 		log.Print(customer)
 		return orders, true
