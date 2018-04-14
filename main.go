@@ -376,7 +376,7 @@ func profile_ctrl(w http.ResponseWriter, r *http.Request) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////get history/////////////////////////////////////////////////////////////////////
-func history_ctrl() {
+func history_ctrl(w http.ResponseWriter, r *http.Request) {
 
 	var history []req.PreOrderView
 	var response string
@@ -392,7 +392,7 @@ func history_ctrl() {
 		history, flg = req.ShowHisrory(customer)
 		if flg {
 			i := 0
-			for order := range history {
+			for _, order := range history {
 				i++
 
 				if order.Recieved == -1 {

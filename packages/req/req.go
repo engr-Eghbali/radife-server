@@ -32,14 +32,13 @@ type PreShop struct {
 ////////////////////////////////////////////////////////////////////////
 
 /////////////////////preview of orders/////////////////////////////////
-type PreOrderView{
-	
-	Total        string   `json:"total"`
-	DateIn       string   `json:"date-in"`
-	TimeIn       string   `json:"time-in"`
-	Recieved     int32    `json:"recieved"`
-
+type PreOrderView struct {
+	Total    string `json:"total"`
+	DateIn   string `json:"date-in"`
+	TimeIn   string `json:"time-in"`
+	Recieved int32  `json:"recieved"`
 }
+
 /////////////////////////////////////each good info////////////////////
 
 type Good struct {
@@ -238,9 +237,9 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 
 		var t time.Time = time.Date(2016, time.January, 1, 12, 1, 1, 0, ptime.Iran())
 		// Get a new instance of ptime.Time using time.Time
-		pt := ptime.New(t)
-		now := pt.Date()
-		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: now.Format("yyyy/MMM/dd"), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
+		pt := ptime.Unix(1454277270, 0, ptime.Iran())
+
+		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: pt.Format("yyyy/MMM/dd"), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
 
 		if err != nil {
 
@@ -494,19 +493,20 @@ func UpdateName(phone string, name string, x string, y string) (flg bool) {
 		return true
 	}
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////when user request history log //////////////////////////////////////////////
-func ShowHisrory(customer string)(list []PreOrderView,flg bool){
+func ShowHisrory(customer string) (list []PreOrderView, flg bool) {
 
 	var orders []PreOrderView
-    var temp   []PreOrderView
+	var temp []PreOrderView
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return orders,false
+		return orders, false
 	}
 
 	defer session.Close()
@@ -514,31 +514,30 @@ func ShowHisrory(customer string)(list []PreOrderView,flg bool){
 	//fetch canceled orders
 	c := session.DB("orderinfo").C("canceled")
 	err = c.Find(bson.M{"customer": customer}).All(&temp)
-	if err ==nil{
-		orders=append(orders,temp)
+	if err == nil {
+		orders = append(orders, temp...)
 	}
 	///////fetch in progress orders
 	c = session.DB("orderinfo").C("inProgress")
 	err1 := c.Find(bson.M{"customer": customer}).All(&temp)
-	if err1 ==nil{
-		orders=append(orders,temp)
+	if err1 == nil {
+		orders = append(orders, temp...)
 	}
 	///fetch recieved orders
-	c := session.DB("orderinfo").C("recieved")
+	c = session.DB("orderinfo").C("recieved")
 	err2 := c.Find(bson.M{"customer": customer}).All(&temp)
-	if err2 ==nil{
-		orders=append(orders,temp)
+	if err2 == nil {
+		orders = append(orders, temp...)
 	}
 
-	if !(err && err1 && err2){
+	if !(err == nil && err1 == nil && err2 == nil) {
 		log.Print("\n log history visited:")
 		log.Print(customer)
-		return orders,true
-	}else{
+		return orders, true
+	} else {
 		log.Print("\n failed to quety preorderview:")
 		log.Print(customer)
-		return orders,false
+		return orders, false
 	}
-	
 
 }
