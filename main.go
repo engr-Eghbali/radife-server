@@ -249,13 +249,19 @@ func cart_ctrl(w http.ResponseWriter, r *http.Request) {
 		total := r.Form["total"][0]
 		cart := r.Form["cart"][0]
 
-		flg := req.Send_cart(shopID, customer, x, y, add, total, cart)
+		orderID := req.Send_cart(shopID, customer, x, y, add, total, cart)
 
-		if flg {
-			response = "1"
+		if orderID =="-1" {
+			response = "-1"
 		} else {
 
-			response = "0"
+			if =="0"{
+
+				response = "0"
+			}else{
+				response=orderID
+			}
+			
 		}
 
 		fmt.Fprintf(w, response)
@@ -316,6 +322,7 @@ func cancelOrder_ctrl(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 
 		customer := r.Form["customer"][0]
+		///** cat is useless!(for some reasons is here...)
 		cat := r.Form["cat"][0]
 		key := r.Form["key"][0]
 

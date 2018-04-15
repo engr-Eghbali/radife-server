@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
+	"encoding/base64"
 	"github.com/mostafah/go-jalali/jalali"
 
 	mgo "gopkg.in/mgo.v2"
@@ -215,7 +215,7 @@ func Get_goods(shopid string, cat string) (goods []Good) {
 
 //////////////////////////set order/////////////////////////////////
 
-func Send_cart(shopID string, customer string, x string, y string, add string, total string, cart string) (flg bool) {
+func Send_cart(shopID string, customer string, x string, y string, add string, total string, cart string) (orderID string) {
 
 	order_array := strings.Split(cart, "#")
 	originx := "0"
@@ -229,7 +229,7 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return false
+		return "0",false
 	} else {
 
 		defer session.Close()
@@ -238,18 +238,20 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 
 		// "Printed on 1392/04/02"
 		// Get a new instance of ptime.Time using time.Time
+		var orderID bson.ObjectId `json:"id" bson:"_id,omitempty"`
+		orderID=bson.NewObjectId()
 
 		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: jalali.Strftime("%Y/%b/%d", time.Now()), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
 
 		if err != nil {
 
 			log.Print("\n !!!!!!!!! new order failed by:" + customer + "!!!!!!!!\n")
-			return false
+			return "-1",false
 
 		} else {
 
 			log.Print("\nnew order submited by:" + customer + "\n")
-			return true
+			return  Base.encode16(orderID.value, case: :lower),true
 		}
 
 	}
