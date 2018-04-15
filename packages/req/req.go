@@ -223,8 +223,11 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 	destinationx := x
 	destinationy := y
 	totalPrice := total
+	var order Order
 
 	session, err := mgo.Dial("127.0.0.1")
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
 	if err != nil {
 
 		log.Print("\n!!!!-- DB connection error:")
@@ -272,9 +275,7 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 			}
 		}
 
-		defer session.Close()
-		session.SetMode(mgo.Monotonic, true)
-		c := session.DB("orderinfo").C("order")
+		c = session.DB("orderinfo").C("order")
 
 		// "Printed on 1392/04/02"
 		// Get a new instance of ptime.Time using time.Time
