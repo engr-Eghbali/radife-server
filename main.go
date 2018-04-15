@@ -251,17 +251,17 @@ func cart_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		orderID := req.Send_cart(shopID, customer, x, y, add, total, cart)
 
-		if orderID =="-1" {
+		if orderID == "-1" {
 			response = "-1"
 		} else {
 
-			if =="0"{
+			if orderID == "0" {
 
 				response = "0"
-			}else{
-				response=orderID
+			} else {
+				response = orderID
 			}
-			
+
 		}
 
 		fmt.Fprintf(w, response)

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"encoding/base64"
+
 	"github.com/mostafah/go-jalali/jalali"
 
 	mgo "gopkg.in/mgo.v2"
@@ -229,7 +229,7 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return "0",false
+		return "0"
 	} else {
 
 		defer session.Close()
@@ -238,20 +238,21 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 
 		// "Printed on 1392/04/02"
 		// Get a new instance of ptime.Time using time.Time
-		var orderID bson.ObjectId `json:"id" bson:"_id,omitempty"`
-		orderID=bson.NewObjectId()
+		var orderID bson.ObjectId
+		orderID = bson.NewObjectId()
+		stringOrderID := orderID.Hex()
 
 		err = c.Insert(&Order{Customer: customer, Shop: shopID, Courier: "0", Cart: order_array, Total: totalPrice, DateIn: jalali.Strftime("%Y/%b/%d", time.Now()), TimeIn: time.Now().Format("3:04PM"), DateOut: "0", TimeOut: "0", OriginX: originx, OriginY: originy, DestinationX: destinationx, DestinationY: destinationy, Recieved: 0, Pay: 0})
 
 		if err != nil {
 
 			log.Print("\n !!!!!!!!! new order failed by:" + customer + "!!!!!!!!\n")
-			return "-1",false
+			return "-1"
 
 		} else {
 
 			log.Print("\nnew order submited by:" + customer + "\n")
-			return  Base.encode16(orderID.value, case: :lower),true
+			return stringOrderID
 		}
 
 	}
