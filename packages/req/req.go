@@ -223,6 +223,7 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 	destinationx := x
 	destinationy := y
 	totalPrice := total
+
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
@@ -231,6 +232,45 @@ func Send_cart(shopID string, customer string, x string, y string, add string, t
 		log.Print("\n")
 		return "0"
 	} else {
+
+		///**check if any inorder cart ,remove it befor start new one
+		c := session.DB("orderinfo").C("order")
+		err = c.Find(bson.M{"customer": customer}).One(&order)
+
+		if err != nil {
+
+			log.Print("\n cancel order query for checking duplicate: :\n")
+			log.Print(err)
+
+		} else {
+			order.Recieved = -1
+			order.Pay = -1
+			order.Courier = "-1"
+			order.TimeOut = "-1"
+			order.DateOut = "-1"
+			c = session.DB("orderinfo").C("canceled")
+			err = c.Insert(&order)
+
+			if err != nil {
+
+				log.Print("\n failed to auto remove order for :" + customer + "!!!!!!!!\n")
+
+			} else {
+
+				c = session.DB("orderinfo").C("order")
+				err = c.Remove(bson.M{"customer": customer})
+
+				if err != nil {
+					fmt.Printf("\nQuery failed to auto remove order for : %v\n", err)
+
+				} else {
+
+					log.Print("\norder auto canceled by user:" + customer + "!!!!!!!!\n")
+
+				}
+
+			}
+		}
 
 		defer session.Close()
 		session.SetMode(mgo.Monotonic, true)
@@ -303,7 +343,7 @@ func Get_factor(customer string, cat string) (items []Recep, promo string, deliv
 		for _, element := range order.Cart {
 
 			log.Print(element)
-			if element == "undefined" {
+			if !strings.Contains(element, "@") {
 				break
 			}
 			NoGood := strings.Split(element, "@")
