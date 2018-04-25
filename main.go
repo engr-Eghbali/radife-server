@@ -449,16 +449,16 @@ func shopStatus_ctrl(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		shopID := r.Form["shopID"][0]
 		category := r.Form["cat"][0]
-		shopStat, flg = req.GetShopStats(category, shopID)
+		shopStat, flg = req.GetShopStats(shopID, category)
 		if flg {
 
 			response = response + "<p1><i class=\"far fa-clock\" style=\"padding-left:2px;\"></i>" + shopStat.Time + "</p1></br><p2><i class=\"fas fa-map-marker-alt\" style=\"padding-left:2px;\"></i>" + shopStat.Hood + " </p2></br>"
 			response = response + "$/$"
-			response = response + "<a hre\"#\"><i class=\"fas fa-info-circle\" style=\"padding-left:2px;\" onclick=\"alert(" + shopStat.Detail + ")\"></i>جزئیات</a>"
+			response = response + "<a hre\"#\" onclick=\"alert('" + shopStat.Detail + "')\"><i class=\"fas fa-info-circle\" style=\"padding-left:2px;\" ></i>جزئیات</a>"
 			response = response + "$/$"
 
 			for _, subcat := range shopStat.Subcats {
-				response = response + "<a href=\"#\" onclick=\"changeSubCat(\"" + subcat + " \") \">" + subcat + "</a>"
+				response = response + "<a href=\"#\" onclick=\"changeSubCat('" + subcat + "') \">" + subcat + "</a>"
 
 			}
 

@@ -611,7 +611,7 @@ func GetShopStats(shopID string, cat string) (shopStats ShopStatus, flg bool) {
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return nil
+		return results, false
 	}
 
 	defer session.Close()
