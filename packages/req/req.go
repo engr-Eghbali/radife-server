@@ -136,6 +136,14 @@ type Shop struct {
 
 ///////////////////////////////////////////////////////////////////////////
 
+///////////Shop status structur ///////////////////////////////////////////
+type ShopStatus struct {
+	Time    string   `json:"time"`
+	Hood    string   `json:"hood"`
+	Detail  string   `json:"detail"`
+	Subcats []string `json:"categories"`
+}
+
 ////////////////calculate delivery cost////////////////////////////////////
 func calcDelivery(userInfoX string, userInfoY string, shopInfoX string, shopInfoy string) (deliveryCost float64) {
 
@@ -588,6 +596,40 @@ func ShowHisrory(customer string) (list []PreOrderView, flg bool) {
 		log.Print("\n failed to quety preorderview:")
 		log.Print(customer)
 		return orders, false
+	}
+
+}
+
+/////////// get shop status and subcategories (for header) /////
+
+func GetShopStats(shopID string, cat string) (shopStats ShopStatus, flg bool) {
+
+	var results ShopStatus
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return nil
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("shopinfo").C(cat)
+
+	err = c.Find(bson.M{"phone": shopID}).one(&results)
+
+	if err != nil {
+
+		log.Print("\n Shop status query failed:\n")
+		log.Print(err)
+		return results, false
+
+	} else {
+
+		return results, true
+
 	}
 
 }
