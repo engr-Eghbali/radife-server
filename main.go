@@ -216,7 +216,9 @@ func goods_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		shopID := r.Form["shopID"][0]
 		category := r.Form["cat"][0]
-		goods = req.Get_goods(shopID, category)
+		subCat := r.Form["subCat"][0]
+
+		goods = req.Get_goods(shopID, category, subCat)
 
 		for _, good := range goods {
 
@@ -462,6 +464,7 @@ func shopStatus_ctrl(w http.ResponseWriter, r *http.Request) {
 
 			}
 
+			response = response + "$/$" + shopStat.Subcats[0]
 			fmt.Fprintf(w, response)
 
 		} else {

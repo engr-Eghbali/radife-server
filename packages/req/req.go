@@ -43,11 +43,12 @@ type PreOrderView struct {
 /////////////////////////////////////each good info////////////////////
 
 type Good struct {
-	ID     bson.ObjectId `json:"id" bson:"_id,omitempty"`
-	Name   string        `json:"name"`
-	Price  string        `json:"price"`
-	Pic    string        `json:"pic"`
-	Detail string        `json:"detail"`
+	ID      bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Name    string        `json:"name"`
+	Price   string        `json:"price"`
+	Pic     string        `json:"pic"`
+	Detail  string        `json:"detail"`
+	Keyword string        `json:"keyword"`
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -188,7 +189,7 @@ func Get_category(cat string) (preview []PreShop) {
 /////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////get goods of each shop/////////////////////////////
-func Get_goods(shopid string, cat string) (goods []Good) {
+func Get_goods(shopid string, cat string, subcat string) (goods []Good) {
 
 	var results []Good
 	session, err := mgo.Dial("127.0.0.1")
@@ -213,6 +214,12 @@ func Get_goods(shopid string, cat string) (goods []Good) {
 		return nil
 
 	} else {
+
+		for i, result := range results {
+			if !strings.Contains(result.Keyword, subcat) {
+				results = append(results[:i], results[i+1:]...)
+			}
+		}
 		return results
 
 	}
