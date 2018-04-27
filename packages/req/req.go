@@ -143,6 +143,7 @@ type ShopStatus struct {
 	Hood    string   `json:"hood"`
 	Detail  string   `json:"detail"`
 	Subcats []string `json:"categories"`
+	liked   bool     `json:"liked"`
 }
 
 ////////////////calculate delivery cost////////////////////////////////////
@@ -611,7 +612,7 @@ func ShowHisrory(customer string) (list []PreOrderView, flg bool) {
 
 /////////// get shop status and subcategories (for header) /////
 
-func GetShopStats(shopID string, cat string) (shopStats ShopStatus, flg bool) {
+func GetShopStats(customer string, shopID string, cat string) (shopStats ShopStatus, flg bool) {
 
 	var results ShopStatus
 	session, err := mgo.Dial("127.0.0.1")
@@ -637,6 +638,12 @@ func GetShopStats(shopID string, cat string) (shopStats ShopStatus, flg bool) {
 
 	} else {
 
+		err = c.Find(bson.M{"followers": bson.M{"$in": customer}}).Limit(1)
+		if err != nil {
+			results.liked = false
+		} else {
+			results.liked = true
+		}
 		return results, true
 
 	}

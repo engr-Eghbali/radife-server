@@ -449,22 +449,35 @@ func shopStatus_ctrl(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 
 		r.ParseForm()
+		customer := r.Form["radifeCustomer"][0]
 		shopID := r.Form["shopID"][0]
 		category := r.Form["cat"][0]
-		shopStat, flg = req.GetShopStats(shopID, category)
+		shopStat, flg = req.GetShopStats(customer, shopID, category)
 		if flg {
-
+			///add time and detail
 			response = response + "<p1><i class=\"far fa-clock\" style=\"padding-left:2px;\"></i>" + shopStat.Time + "</p1></br><p2><i class=\"fas fa-map-marker-alt\" style=\"padding-left:2px;\"></i>" + shopStat.Hood + " </p2></br>"
 			response = response + "$/$"
 			response = response + "<a hre\"#\" onclick=\"alert('" + shopStat.Detail + "')\"><i class=\"fas fa-info-circle\" style=\"padding-left:2px;\" ></i>جزئیات</a>"
 			response = response + "$/$"
 
+			//adding subcategories
 			for _, subcat := range shopStat.Subcats {
 				response = response + "<a href=\"#\" onclick=\"changeSubCat('" + subcat + "') \">" + subcat + "</a>"
 
 			}
-
+			//adding defualt subcategorie
 			response = response + "$/$" + shopStat.Subcats[0]
+
+			//liked or not
+			response = response + "$/$"
+			if shopStat.liked {
+
+				response = response + " <a href=\"#\" id=\"favorit\" onclick=\"nofavorit()\"><i class=\"fas fa-heart\" style=\"padding-left:2px;color:red;\" id=\"heart\"></i>علاقه مندی ها</a>"
+
+			} else {
+				response = response + " <a href=\"#\" id=\"favorit\" onclick=\"favorit()\"><i class=\"far fa-heart\" style=\"padding-left:2px;\" id=\"heart\"></i>علاقه مندی ها</a>"
+			}
+
 			fmt.Fprintf(w, response)
 
 		} else {
