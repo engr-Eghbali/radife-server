@@ -650,3 +650,28 @@ func GetShopStats(customer string, shopID string, cat string) (shopStats ShopSta
 	}
 
 }
+
+func AddFollower(customer string, shopID string, category string) (flg bool) {
+
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return results, false
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("shopinfo").C(category)
+	idQueryier := bson.M{"phone": shopID}
+	change := bson.M{"$push": bson.M{"subcats": bson.M{"i": customer}}}
+	err = c.Update(idQuerier, change)
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
+
+}
