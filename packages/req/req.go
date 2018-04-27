@@ -192,6 +192,7 @@ func Get_category(cat string) (preview []PreShop) {
 func Get_goods(shopid string, cat string, subcat string) (goods []Good) {
 
 	var results []Good
+	var temp []Good
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
@@ -205,7 +206,7 @@ func Get_goods(shopid string, cat string, subcat string) (goods []Good) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("goods").C(cat)
 
-	err = c.Find(bson.M{"shopid": shopid}).All(&results)
+	err = c.Find(bson.M{"shopid": shopid}).All(&temp)
 
 	if err != nil {
 
@@ -215,9 +216,10 @@ func Get_goods(shopid string, cat string, subcat string) (goods []Good) {
 
 	} else {
 
-		for i, result := range results {
-			if !strings.Contains(result.Keyword, subcat) {
-				results = append(results[:i], results[i+1:]...)
+		for i, result := range temp {
+			if strings.Contains(result.Keyword, subcat) {
+
+				results = append(results, result)
 			}
 		}
 		return results
@@ -625,7 +627,7 @@ func GetShopStats(shopID string, cat string) (shopStats ShopStatus, flg bool) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("shopinfo").C(cat)
 
-	err = c.Find(bson.M{"phone": shopID}).one(&results)
+	err = c.Find(bson.M{"phone": shopID}).One(&results)
 
 	if err != nil {
 
