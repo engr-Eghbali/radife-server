@@ -143,7 +143,7 @@ type ShopStatus struct {
 	Hood    string   `json:"hood"`
 	Detail  string   `json:"detail"`
 	Subcats []string `json:"categories"`
-	liked   bool     `json:"liked"`
+	Liked   bool     `json:"liked"`
 }
 
 ////////////////calculate delivery cost////////////////////////////////////
@@ -217,7 +217,7 @@ func Get_goods(shopid string, cat string, subcat string) (goods []Good) {
 
 	} else {
 
-		for i, result := range temp {
+		for _, result := range temp {
 			if strings.Contains(result.Keyword, subcat) {
 
 				results = append(results, result)
@@ -638,11 +638,12 @@ func GetShopStats(customer string, shopID string, cat string) (shopStats ShopSta
 
 	} else {
 
-		err = c.Find(bson.M{"followers": bson.M{"$in": customer}}).Limit(1)
+		iter := c.Find(bson.M{"followers": bson.M{"$in": customer}}).Limit(1).Iter()
+		err = iter.Err()
 		if err != nil {
-			results.liked = false
+			results.Liked = true
 		} else {
-			results.liked = true
+			results.Liked = false
 		}
 		return results, true
 

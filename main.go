@@ -470,7 +470,7 @@ func shopStatus_ctrl(w http.ResponseWriter, r *http.Request) {
 
 			//liked or not
 			response = response + "$/$"
-			if shopStat.liked {
+			if shopStat.Liked {
 
 				response = response + " <a href=\"#\" id=\"favorit\" onclick=\"nofavorit()\"><i class=\"fas fa-heart\" style=\"padding-left:2px;color:red;\" id=\"heart\"></i>علاقه مندی ها</a>"
 
