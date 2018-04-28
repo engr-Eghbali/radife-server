@@ -621,7 +621,7 @@ func GetShopStats(customer string, shopID string, cat string) (shopStats ShopSta
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return results, false
+		return results, false, false
 	}
 
 	defer session.Close()
@@ -634,7 +634,7 @@ func GetShopStats(customer string, shopID string, cat string) (shopStats ShopSta
 
 		log.Print("\n Shop status query failed:\n")
 		log.Print(err)
-		return results, false
+		return results, false, false
 
 	} else {
 
@@ -666,7 +666,32 @@ func AddFollower(customer string, shopID string, category string) (flg bool) {
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("shopinfo").C(category)
 	idQuerier := bson.M{"phone": shopID}
-	change := bson.M{"$push": bson.M{"follower": customer}}
+	change := bson.M{"$push": bson.M{"followers": customer}}
+	err = c.Update(idQuerier, change)
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
+
+}
+
+func unfollower(customer string, shopID string, category string) (flg bool) {
+
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return false
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("shopinfo").C(category)
+	idQuerier := bson.M{"phone": shopID}
+	change := bson.M{"$pull": bson.M{"followers": customer}}
 	err = c.Update(idQuerier, change)
 	if err != nil {
 		return false
