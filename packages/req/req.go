@@ -676,7 +676,7 @@ func AddFollower(customer string, shopID string, category string) (flg bool) {
 
 }
 
-func unfollower(customer string, shopID string, category string) (flg bool) {
+func Unfollower(customer string, shopID string, category string) (flg bool) {
 
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {

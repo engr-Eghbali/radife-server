@@ -532,7 +532,7 @@ func unfollow_ctrl(w http.ResponseWriter, r *http.Request) {
 		customer := r.Form["radifeCustomer"][0]
 		shopID := r.Form["shopID"][0]
 		category := r.Form["cat"][0]
-		flg := req.unfollower(customer, shopID, category)
+		flg := req.Unfollower(customer, shopID, category)
 		if flg {
 
 			fmt.Fprintf(w, "1")
