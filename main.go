@@ -442,7 +442,7 @@ func shopStatus_ctrl(w http.ResponseWriter, r *http.Request) {
 	var shopStat req.ShopStatus
 	var response string
 	var flg bool
-
+	var liked bool
 	w.Header().Set("Content-Type", "text/javascript")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
@@ -452,7 +452,7 @@ func shopStatus_ctrl(w http.ResponseWriter, r *http.Request) {
 		customer := r.Form["radifeCustomer"][0]
 		shopID := r.Form["shopID"][0]
 		category := r.Form["cat"][0]
-		shopStat, flg = req.GetShopStats(customer, shopID, category)
+		shopStat, liked, flg = req.GetShopStats(customer, shopID, category)
 		if flg {
 			///add time and detail
 			response = response + "<p1><i class=\"far fa-clock\" style=\"padding-left:2px;\"></i>" + shopStat.Time + "</p1></br><p2><i class=\"fas fa-map-marker-alt\" style=\"padding-left:2px;\"></i>" + shopStat.Hood + " </p2></br>"
@@ -470,7 +470,7 @@ func shopStatus_ctrl(w http.ResponseWriter, r *http.Request) {
 
 			//liked or not
 			response = response + "$/$"
-			if shopStat.Liked {
+			if liked {
 
 				response = response + " <a href=\"#\" id=\"favorit\" onclick=\"nofavorit()\"><i class=\"fas fa-heart\" style=\"padding-left:2px;color:red;\" id=\"heart\"></i>علاقه مندی ها</a>"
 

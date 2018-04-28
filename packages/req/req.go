@@ -139,11 +139,11 @@ type Shop struct {
 
 ///////////Shop status structur ///////////////////////////////////////////
 type ShopStatus struct {
-	Time    string   `json:"time"`
-	Hood    string   `json:"hood"`
-	Detail  string   `json:"detail"`
-	Subcats []string `json:"categories"`
-	Liked   bool     `json:"liked"`
+	Time      string   `json:"time"`
+	Hood      string   `json:"hood"`
+	Detail    string   `json:"detail"`
+	Subcats   []string `json:"categories"`
+	Followers []string `json:"followers"`
 }
 
 ////////////////calculate delivery cost////////////////////////////////////
@@ -612,7 +612,7 @@ func ShowHisrory(customer string) (list []PreOrderView, flg bool) {
 
 /////////// get shop status and subcategories (for header) /////
 
-func GetShopStats(customer string, shopID string, cat string) (shopStats ShopStatus, flg bool) {
+func GetShopStats(customer string, shopID string, cat string) (shopStats ShopStatus, liked bool, flg bool) {
 
 	var results ShopStatus
 	session, err := mgo.Dial("127.0.0.1")
@@ -638,14 +638,14 @@ func GetShopStats(customer string, shopID string, cat string) (shopStats ShopSta
 
 	} else {
 
-		iter := c.Find(bson.M{"followers": bson.M{"$in": customer}}).Limit(1).Iter()
-		err = iter.Err()
-		if err != nil {
-			results.Liked = true
-		} else {
-			results.Liked = false
+		for i := range results.Followers {
+			if results.Followers[i] == customer {
+
+				return results, true, true
+			}
 		}
-		return results, true
+
+		return results, false, true
 
 	}
 
@@ -659,14 +659,14 @@ func AddFollower(customer string, shopID string, category string) (flg bool) {
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return results, false
+		return false
 	}
 
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("shopinfo").C(category)
-	idQueryier := bson.M{"phone": shopID}
-	change := bson.M{"$push": bson.M{"subcats": bson.M{"i": customer}}}
+	idQuerier := bson.M{"phone": shopID}
+	change := bson.M{"$push": bson.M{"follower": customer}}
 	err = c.Update(idQuerier, change)
 	if err != nil {
 		return false
