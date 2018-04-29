@@ -664,14 +664,33 @@ func AddFollower(customer string, shopID string, category string) (flg bool) {
 
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+	//add shop follower
 	c := session.DB("shopinfo").C(category)
 	idQuerier := bson.M{"phone": shopID}
 	change := bson.M{"$push": bson.M{"followers": customer}}
 	err = c.Update(idQuerier, change)
 	if err != nil {
+		log.Print("failed to follow:")
+		log.Print(err)
 		return false
 	} else {
-		return true
+
+		//add user following
+		c = session.DB("userinfo").C("users")
+		idQuerier = bson.M{"phone": customer}
+		change = bson.M{"$push": bson.M{"followings": shopID}}
+		err = c.Update(idQuerier, change)
+		if err != nil {
+
+			log.Print("failed to follow:")
+			log.Print(err)
+			return false
+
+		} else {
+
+			return true
+		}
+
 	}
 
 }
@@ -694,9 +713,26 @@ func Unfollower(customer string, shopID string, category string) (flg bool) {
 	change := bson.M{"$pull": bson.M{"followers": customer}}
 	err = c.Update(idQuerier, change)
 	if err != nil {
+		log.Print("failed to unfollow:")
+		log.Print(err)
 		return false
 	} else {
-		return true
+
+		c = session.DB("userinfo").C("users")
+		idQuerier := bson.M{"phone": customer}
+		change := bson.M{"$pull": bson.M{"followings": shopID}}
+		err = c.Update(idQuerier, change)
+		if err != nil {
+
+			log.Print("failed to unfollow:")
+			log.Print(err)
+			return false
+
+		} else {
+
+			return true
+		}
+
 	}
 
 }
