@@ -107,7 +107,7 @@ type User struct {
 
 	Log []string `json:"log"`
 
-	Favorit []string `json:"favorit"`
+	Favorite []string `json:"favorite"`
 
 	Wallet string `json:"wallet"`
 
@@ -736,3 +736,44 @@ func Unfollower(customer string, shopID string, category string) (flg bool) {
 	}
 
 }
+
+//////////////////////////get user favorite shops/////
+
+func Favorite(cat string) (preview []PreShop) {
+
+	var results []PreShop
+	var favorits []string
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+
+		log.Print("\n!!!!-- DB connection error:")
+		log.Print(err)
+		log.Print("\n")
+		return nil
+	}
+
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("userinfo").C("users")
+	err = c.Find(bson.M{"favorite"}).All(&favorits)
+
+	if err != nil {
+
+
+		log.Print("\n user favorite query failed:\n")
+		log.Print(err)
+		return nil
+
+	} else {
+
+		for item,_ := favorits{
+/////////////////////////commit
+
+		}
+		return results
+
+	}
+
+}
+
+/////////////////////////////////////////////////////////////////////////////
