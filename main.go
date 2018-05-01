@@ -520,7 +520,7 @@ func follow_ctrl(w http.ResponseWriter, r *http.Request) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////add favorit(follow process)/////////////////////////////////////////////////////////////
+////////////////////////get favorits list/////////////////////////////////////////////////////////////
 func favorite_ctrl(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/javascript")
@@ -532,12 +532,12 @@ func favorite_ctrl(w http.ResponseWriter, r *http.Request) {
 		var ranking string
 		var i int64 = 0
 		var stars int64
+		var flg bool
+
 		r.ParseForm()
-		cat := r.Form["category"][0]
-		shopID := r.Form["shopID"][0]
 		customer := r.Form["customer"][0]
 
-		shops = req.Favorite(cat, shopID, customer)
+		shops, flg = req.Favorite(customer)
 
 		for _, shop := range shops {
 

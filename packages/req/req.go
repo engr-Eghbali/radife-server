@@ -739,17 +739,20 @@ func Unfollower(customer string, shopID string, category string) (flg bool) {
 
 //////////////////////////get user favorite shops/////
 
-func Favorite(cat string) (preview []PreShop) {
+func Favorite(user string) (preview []PreShop,flg bool) {
 
 	var results []PreShop
 	var favorits []string
+	var temp     []PreShop
+	var cats     []string={"bakery","butcher","confectionary","greens","market","medical","resturant"}
+	var flg       bool=false
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return nil
+		return results,flg
 	}
 
 	defer session.Close()
@@ -758,19 +761,34 @@ func Favorite(cat string) (preview []PreShop) {
 	err = c.Find(bson.M{"favorite"}).All(&favorits)
 
 	if err != nil {
-
-
 		log.Print("\n user favorite query failed:\n")
 		log.Print(err)
-		return nil
+		return results,flg
 
 	} else {
 
-		for item,_ := favorits{
+		for cat,_:= range cats {
+
+			c = session.DB("shopinfo").C(cat)
+
+			for phone,_ := range favorits {
+				
+				err = c.Find(bson.M{"phone":phone}).One(&temp)
+				if err!=nil{
+					continue
+				}else{
+					results=append(results,temp)
+                    flg=true
+					break
+				}
+			
+
+			}
 /////////////////////////commit
 
 		}
-		return results
+
+		return results,flg
 
 	}
 
