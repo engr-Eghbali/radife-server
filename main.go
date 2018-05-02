@@ -585,7 +585,7 @@ func favorite_ctrl(w http.ResponseWriter, r *http.Request) {
 					i++
 				}
 
-				response = response + "<div class=\"market\" onclick=\"getgoods('" + shop.Phone + "')\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\">" + ranking + "</p><p class=\"restoff\">" + offer + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + delivery + "</p></div></div>"
+				response = response + "<div class=\"market\" onclick=\"getgoods('" + shop.Phone + "','"+shop.Cat+"'")\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\">" + ranking + "</p><p class=\"restoff\">" + offer + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + delivery + "</p></div></div>"
 
 			}
 			fmt.Fprintf(w, response)

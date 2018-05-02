@@ -28,6 +28,8 @@ type PreShop struct {
 	Off string `json:"off"`
 
 	Delivery int64 `json:"delivery"`
+
+	Cat string `json:"category"`
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -742,7 +744,7 @@ func Unfollower(customer string, shopID string, category string) (flg bool) {
 func Favorite(user string) (preview []PreShop, flag bool) {
 
 	type favorite struct {
-		Favorite []string `json:"favorite"`
+		Followings []string `json:"favorite"`
 	}
 	var results []PreShop
 	var favorits favorite
@@ -761,7 +763,7 @@ func Favorite(user string) (preview []PreShop, flag bool) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("userinfo").C("users")
-	err = c.Find(nil).All(&favorits)
+	err = c.Find(bson.M{"phone": user}).One(&favorits)
 
 	if err != nil {
 		log.Print("\n user favorite query failed:\n")
@@ -770,17 +772,22 @@ func Favorite(user string) (preview []PreShop, flag bool) {
 
 	} else {
 
+		log.Print(cats[0])
+		log.Print(favorits.Followings[0])
 		for _, cat := range cats {
 
 			c = session.DB("shopinfo").C(cat)
 
-			for _, phone := range favorits {
+			for _, phone := range favorits.Followings {
 
 				err = c.Find(bson.M{"phone": phone}).One(&temp)
 				if err != nil {
+
 					continue
 				} else {
+					temp.Cat = cat
 					results = append(results, temp)
+
 					flg = true
 					break
 				}
