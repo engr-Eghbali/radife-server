@@ -771,7 +771,7 @@ func Favorite(user string) (preview []PreShop, flag bool) {
 
 			c = session.DB("shopinfo").C(cat)
 
-			for _, phone := range favorits {
+			for _, phone := range favorite {
 
 				err = c.Find(bson.M{"phone": phone}).One(&temp)
 				if err != nil {

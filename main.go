@@ -563,30 +563,36 @@ func favorite_ctrl(w http.ResponseWriter, r *http.Request) {
 
 		shops, flg = req.Favorite(customer)
 
-		for _, shop := range shops {
+		if flg {
 
-			offer := shop.Off + "%%تخفیف"
-			delivery := "ارسال رایگان"
-			stars, _ = strconv.ParseInt(shop.Stars, 10, 64)
+			for _, shop := range shops {
 
-			if shop.Delivery != 0 {
-				delivery = strconv.FormatInt(shop.Delivery, 10) + "هزینه ارسال"
-			}
-			for i < 6 {
+				offer := shop.Off + "%%تخفیف"
+				delivery := "ارسال رایگان"
+				stars, _ = strconv.ParseInt(shop.Stars, 10, 64)
 
-				if stars > i {
-					ranking = ranking + "<span class=\"glyphicon glyphicon-star-empty\"></span>"
-				} else {
-					ranking = ranking + "<span class=\"glyphicon glyphicon-star\"></span>"
+				if shop.Delivery != 0 {
+					delivery = strconv.FormatInt(shop.Delivery, 10) + "هزینه ارسال"
+				}
+				for i < 6 {
+
+					if stars > i {
+						ranking = ranking + "<span class=\"glyphicon glyphicon-star-empty\"></span>"
+					} else {
+						ranking = ranking + "<span class=\"glyphicon glyphicon-star\"></span>"
+					}
+
+					i++
 				}
 
-				i++
+				response = response + "<div class=\"market\" onclick=\"getgoods('" + shop.Phone + "')\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\">" + ranking + "</p><p class=\"restoff\">" + offer + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + delivery + "</p></div></div>"
+
 			}
-
-			response = response + "<div class=\"market\" onclick=\"getgoods('" + shop.Phone + "')\"><img class=\"marketicon\" src=\"" + shop.Avatar + "\"><p class=\"restname\">" + shop.Name + "</p><p class=\"restlocation\"><span class=\"glyphicon glyphicon-pushpin\"></span>" + shop.Add + "</p><div id=\"reststatus\"><p class=\"stars\">" + ranking + "</p><p class=\"restoff\">" + offer + "</p><p class=\"bike\"><i class=\"fas fa-motorcycle\"></i>" + delivery + "</p></div></div>"
-
+			fmt.Fprintf(w, response)
+		} else {
+			fmt.Fprintf(w, "not found")
 		}
-		fmt.Fprintf(w, response)
+
 	}
 
 }
