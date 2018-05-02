@@ -741,8 +741,11 @@ func Unfollower(customer string, shopID string, category string) (flg bool) {
 
 func Favorite(user string) (preview []PreShop, flag bool) {
 
+	type favorite struct {
+		Favorite []string `json:"favorite"`
+	}
 	var results []PreShop
-	var favorite []string
+	var favorits favorite
 	var temp PreShop
 	cats := []string{"bakery", "butcher", "confectionary", "greens", "market", "medical", "resturant"}
 	var flg bool = false
@@ -758,7 +761,7 @@ func Favorite(user string) (preview []PreShop, flag bool) {
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("userinfo").C("users")
-	err = c.Find(nil).All(&favorite)
+	err = c.Find(nil).All(&favorits)
 
 	if err != nil {
 		log.Print("\n user favorite query failed:\n")
@@ -771,7 +774,7 @@ func Favorite(user string) (preview []PreShop, flag bool) {
 
 			c = session.DB("shopinfo").C(cat)
 
-			for _, phone := range favorite {
+			for _, phone := range favorits {
 
 				err = c.Find(bson.M{"phone": phone}).One(&temp)
 				if err != nil {
