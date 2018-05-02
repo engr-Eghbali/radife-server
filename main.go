@@ -519,6 +519,30 @@ func follow_ctrl(w http.ResponseWriter, r *http.Request) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+func unfollow_ctrl(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "text/javascript")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	if r.Method == "POST" {
+
+		r.ParseForm()
+		customer := r.Form["radifeCustomer"][0]
+		shopID := r.Form["shopID"][0]
+		category := r.Form["cat"][0]
+		flg := req.Unfollower(customer, shopID, category)
+		if flg {
+
+			fmt.Fprintf(w, "1")
+
+		} else {
+
+			fmt.Fprintf(w, "0")
+		}
+
+	}
+
+}
 
 ////////////////////////get favorits list/////////////////////////////////////////////////////////////
 func favorite_ctrl(w http.ResponseWriter, r *http.Request) {

@@ -739,56 +739,55 @@ func Unfollower(customer string, shopID string, category string) (flg bool) {
 
 //////////////////////////get user favorite shops/////
 
-func Favorite(user string) (preview []PreShop,flg bool) {
+func Favorite(user string) (preview []PreShop, flag bool) {
 
 	var results []PreShop
-	var favorits []string
-	var temp     []PreShop
-	var cats     []string={"bakery","butcher","confectionary","greens","market","medical","resturant"}
-	var flg       bool=false
+	var favorite []string
+	var temp PreShop
+	cats := []string{"bakery", "butcher", "confectionary", "greens", "market", "medical", "resturant"}
+	var flg bool = false
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 
 		log.Print("\n!!!!-- DB connection error:")
 		log.Print(err)
 		log.Print("\n")
-		return results,flg
+		return results, flg
 	}
 
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("userinfo").C("users")
-	err = c.Find(bson.M{"favorite"}).All(&favorits)
+	err = c.Find(nil).All(&favorite)
 
 	if err != nil {
 		log.Print("\n user favorite query failed:\n")
 		log.Print(err)
-		return results,flg
+		return results, flg
 
 	} else {
 
-		for cat,_:= range cats {
+		for _, cat := range cats {
 
 			c = session.DB("shopinfo").C(cat)
 
-			for phone,_ := range favorits {
-				
-				err = c.Find(bson.M{"phone":phone}).One(&temp)
-				if err!=nil{
+			for _, phone := range favorits {
+
+				err = c.Find(bson.M{"phone": phone}).One(&temp)
+				if err != nil {
 					continue
-				}else{
-					results=append(results,temp)
-                    flg=true
+				} else {
+					results = append(results, temp)
+					flg = true
 					break
 				}
-			
 
 			}
-/////////////////////////commit
+			/////////////////////////commit
 
 		}
 
-		return results,flg
+		return results, flg
 
 	}
 
