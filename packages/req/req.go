@@ -804,3 +804,45 @@ func Favorite(user string) (preview []PreShop, flag bool) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
+func Schedule(customer string, timeOut string, dateOut string, name string) (flag bool) {
+
+	var temp Order
+	session, err := mgo.Dial("127.0.0.1")
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("orderinfo").C("order")
+	err = c.Find(bson.M{"customer": customer}).One(&temp)
+
+	if err != nil {
+		log.Print("\n user schedule query failed:\n")
+		log.Print(err)
+		return false
+
+	} else {
+		temp.DateOut = dateOut
+		temp.TimeOut = timeOut
+		temp.Courier = name
+		err = c.Remove(bson.M{"customer": customer})
+		if err != nil {
+			log.Print("\n !!! temp Order failed to delete:\n")
+			log.Print(err)
+			log.Print(customer)
+		}
+		c = session.DB("orderinfo").C("schedule")
+		err = c.Insert(&temp)
+
+		if err != nil {
+			log.Print("\n user schedule query failed:\n")
+			log.Print(err)
+			return false
+
+		} else {
+
+			log.Print("\n user scheduled order:\n")
+			log.Print(customer)
+			return true
+		}
+
+	}
+
+}
