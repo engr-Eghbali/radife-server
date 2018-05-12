@@ -147,6 +147,17 @@ type ShopStatus struct {
 	Subcats   []string `json:"categories"`
 	Followers []string `json:"followers"`
 }
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////preSchedule view structure//////////////////////////////
+type PreScheduleView struct {
+	Total     string `json:"total"`
+	DateOut   string `json:"date-out"`
+	TimeOut   string `json:"time-out"`
+	ID        ID bson.ObjectId `json:"id" bson:"_id,omitempty"`
+}
+
+////////////////////////////////////////////////////////////////////////////
 
 ////////////////calculate delivery cost////////////////////////////////////
 func calcDelivery(userInfoX string, userInfoY string, shopInfoX string, shopInfoy string) (deliveryCost float64) {
@@ -845,4 +856,26 @@ func Schedule(customer string, timeOut string, dateOut string, name string) (fla
 
 	}
 
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+func ShowSchedule(customer string)(res []PreScheduleView,flag bool){
+
+	var temp []PreScheduleView
+	session, err := mgo.Dial("127.0.0.1")
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("orderinfo").C("schedule")
+	err = c.Find(bson.M{"customer": customer}).All(&temp)
+
+	if err != nil {
+		log.Print("\n user schedule view query failed:\n")
+		log.Print(err)
+		return temp,false
+
+	} else {
+
+		log.Print("\n user schedule checked:\n")
+		log.Print(customer)
+		return temp,true
 }
