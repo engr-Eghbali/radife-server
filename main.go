@@ -672,7 +672,7 @@ func cancelSchedule_ctrl(w http.ResponseWriter, r *http.Request) {
 		customer := r.Form["customer"][0]
 		orderID := r.Form["orderID"][0]
 		//key :=r.Form["key"][0]
-		flg := req.cancelSchedule(customer, orderID)
+		flg := req.CancelSchedule(customer, orderID)
 
 		if flg {
 

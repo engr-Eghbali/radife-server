@@ -886,24 +886,26 @@ func ShowSchedule(customer string) (res []PreScheduleView, flag bool) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////cancel scheduled order/////////////////////////////////
-func cancelSchedule(customer string, orderID string) (flag bool) {
+func CancelSchedule(customer string, orderID string) (flag bool) {
 
 	var temp Order
 	session, err := mgo.Dial("127.0.0.1")
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
 	c := session.DB("orderinfo").C("schedule")
-	err = c.Find(bson.ObjectIdHex(orderID)).one(&temp)
+	err = c.FindId(bson.ObjectIdHex(orderID)).One(&temp)
 	if err != nil {
 		log.Print("\ncancel scheduled order query failed or maybe not found for:")
 		log.Print(customer)
+		log.Print(err)
 		return false
 	} else {
-		err = c.Remove(bson.ObjectIdHex(orderID))
+		err = c.Remove(bson.M{"_id": bson.ObjectIdHex(orderID)})
 		if err != nil {
 
 			log.Print("\ncancel scheduled order failed to remove for:")
 			log.Print(customer)
+			log.Print(err)
 			return false
 		} else {
 
@@ -912,9 +914,17 @@ func cancelSchedule(customer string, orderID string) (flag bool) {
 			if err != nil {
 				log.Print("\ncancel scheduled order failed to commit for:")
 				log.Print(customer)
+				log.Print(err)
+				log.Print("\ntrying again @ ")
+				log.Print(orderID)
 				err = c.Insert(&temp)
+				log.Print(err)
 				return true
 			} else {
+
+				log.Print("\nuser canceled the scheduled order:")
+				log.Print(customer + " @ ")
+				log.Print(orderID)
 				return true
 			}
 		}
