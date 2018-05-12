@@ -57,21 +57,22 @@ type Good struct {
 
 ////////////////////////////////////each cart info////////////////////////
 type Order struct {
-	Customer     string   `json:"customer"`
-	Shop         string   `json:"shop"`
-	Courier      string   `json:"courier"`
-	Cart         []string `json:"cart"`
-	Total        string   `json:"total"`
-	DateIn       string   `json:"date-in"`
-	TimeIn       string   `json:"time-in"`
-	DateOut      string   `json:"date-out"`
-	TimeOut      string   `json:"time-out"`
-	OriginX      string   `json:"originX"`
-	OriginY      string   `json:"originY"`
-	DestinationX string   `json:"destinationX"`
-	DestinationY string   `json:"destinationY"`
-	Recieved     int32    `json:"recieved"`
-	Pay          int32    `json:"pay"`
+	ID           bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Customer     string        `json:"customer"`
+	Shop         string        `json:"shop"`
+	Courier      string        `json:"courier"`
+	Cart         []string      `json:"cart"`
+	Total        string        `json:"total"`
+	DateIn       string        `json:"date-in"`
+	TimeIn       string        `json:"time-in"`
+	DateOut      string        `json:"date-out"`
+	TimeOut      string        `json:"time-out"`
+	OriginX      string        `json:"originX"`
+	OriginY      string        `json:"originY"`
+	DestinationX string        `json:"destinationX"`
+	DestinationY string        `json:"destinationY"`
+	Recieved     int32         `json:"recieved"`
+	Pay          int32         `json:"pay"`
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -147,14 +148,15 @@ type ShopStatus struct {
 	Subcats   []string `json:"categories"`
 	Followers []string `json:"followers"`
 }
+
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////preSchedule view structure//////////////////////////////
 type PreScheduleView struct {
-	Total     string `json:"total"`
-	DateOut   string `json:"date-out"`
-	TimeOut   string `json:"time-out"`
-	ID        ID bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Total   string        `json:"total"`
+	DateOut string        `json:"date-out"`
+	TimeOut string        `json:"time-out"`
+	ID      bson.ObjectId `json:"id" bson:"_id,omitempty"`
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -857,9 +859,10 @@ func Schedule(customer string, timeOut string, dateOut string, name string) (fla
 	}
 
 }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-func ShowSchedule(customer string)(res []PreScheduleView,flag bool){
+func ShowSchedule(customer string) (res []PreScheduleView, flag bool) {
 
 	var temp []PreScheduleView
 	session, err := mgo.Dial("127.0.0.1")
@@ -871,11 +874,50 @@ func ShowSchedule(customer string)(res []PreScheduleView,flag bool){
 	if err != nil {
 		log.Print("\n user schedule view query failed:\n")
 		log.Print(err)
-		return temp,false
+		return temp, false
 
 	} else {
 
 		log.Print("\n user schedule checked:\n")
 		log.Print(customer)
-		return temp,true
+		return temp, true
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////cancel scheduled order/////////////////////////////////
+func cancelSchedule(customer string, orderID string) (flag bool) {
+
+	var temp Order
+	session, err := mgo.Dial("127.0.0.1")
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("orderinfo").C("schedule")
+	err = c.Find(bson.ObjectIdHex(orderID)).one(&temp)
+	if err != nil {
+		log.Print("\ncancel scheduled order query failed or maybe not found for:")
+		log.Print(customer)
+		return false
+	} else {
+		err = c.Remove(bson.ObjectIdHex(orderID))
+		if err != nil {
+
+			log.Print("\ncancel scheduled order failed to remove for:")
+			log.Print(customer)
+			return false
+		} else {
+
+			c = session.DB("orderinfo").C("canceled")
+			err = c.Insert(&temp)
+			if err != nil {
+				log.Print("\ncancel scheduled order failed to commit for:")
+				log.Print(customer)
+				err = c.Insert(&temp)
+				return true
+			} else {
+				return true
+			}
+		}
+	}
+
 }
